@@ -1837,13 +1837,12 @@ function NavBar({ currentPage, setCurrentPage }) {
               <Layers3 className="h-5 w-5" />
             </div>
             <div>
-              <div className="text-sm text-slate-500">Research Showcase</div>
-              <div className="font-semibold text-slate-900">
-                二分類資料堆疊整合學習器
+              <div className="font-semibold text-slate-1500">
+                兩分類資料堆疊整合學習器
               </div>
             </div>
           </div>
-          <div className="hidden lg:flex items-center gap-2 flex-wrap justify-end">
+          <div className="flex items-center gap-2 flex-wrap justify-end">
             {pageItems.map((item) => {
               const Icon = item.icon;
               const active = currentPage === item.id;
@@ -1882,20 +1881,17 @@ function HomePage({ setCurrentPage }) {
             variants={fadeUp}
             className="space-y-6"
           >
-            <Badge className="rounded-full bg-[#ddedaa] text-[#d7816a] hover:bg-[#ddedaa]">
-              <Sparkles className="mr-2 h-4 w-4" />
-              論文展示等級專題網站
-            </Badge>
-            <h1 className="text-4xl font-bold leading-tight tracking-tight text-slate-900 md:text-6xl">
-              二分類資料堆疊整合學習器
+            <h1 className="text-4xl font-bold leading-tight tracking-tight text-slate-900 md:text-5xl">
+              兩分類資料堆疊整合學習器
               <span className="block text-[#d7816a]">
-                Research Demo Website
+                Two-Classification Data Stack Integrated Learner
               </span>
             </h1>
-            <p className="max-w-2xl text-lg leading-8 text-slate-600">
-              本網站以分頁式研究展示頁的方式整合研究摘要、研究動機、研究目的、資料處理流程、核心方法、LaTeX
-              公式、模型比較圖、 資料集切換視覺化、混淆矩陣、ROC / PR 曲線、OOF
-              prediction 與文獻脈絡。
+            <p className="max-w-2xl text-lg leading-8 text-slate-600 md:text-2xl">
+              指導教授:李名鏞
+            </p>
+            <p className="md:text-1xl">
+              專題組員:許博翔、顏畯榤、張妍婷、柯廷翰、陳宗揚、葉芷儀、韋葶妤、倪佩榆
             </p>
             <div className="flex flex-wrap gap-3">
               <Button
@@ -1905,8 +1901,7 @@ function HomePage({ setCurrentPage }) {
                 查看核心方法 <ChevronRight className="ml-1 h-4 w-4" />
               </Button>
               <Button
-                variant="outline"
-                className="rounded-2xl"
+                className="rounded-2xl bg-[#93b5c6] text-white hover:bg-[#7fa7b8]"
                 onClick={() => setCurrentPage("research")}
               >
                 前往研究流程
@@ -1941,22 +1936,22 @@ function HomePage({ setCurrentPage }) {
             variants={fadeUp}
             className="grid gap-4"
           >
-            <Card className="rounded-[28px] border-0 bg-slate-900 text-white shadow-xl">
+            <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <Microscope className="h-5 w-5 text-[#ddedaa]" /> 摘要
+                <CardTitle className="flex items-center gap-2 text-lg text-slate-800">
+                  <Microscope className="h-5 w-5 text-[#F0CF65]" /> 摘要
                 </CardTitle>
-                <CardDescription className="text-slate-300">
+                <CardDescription className="text-slate-600">
                   研究核心概念與整體方向
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4 text-sm leading-7 text-slate-200">
+              <CardContent className="space-y-4 text-sm leading-7 text-slate-600">
                 <p>
-                  本研究比較多種二元分類基礎模型，並透過不同的 stacking
-                  與機率加權整合方式，檢驗是否能在多資料集任務中提升分類準確度、穩定性與泛化能力。
+                  本研究比較多種二元分類基礎模型，並透過不同的堆疊加權方法
+                  、勝算加權以及逆變異數加權整合方式，檢驗是否能在多資料集任務中提升分類準確度、穩定性與泛化能力。
                 </p>
                 <p>
-                  研究流程涵蓋資料前處理、模型訓練、模型篩選、次層整合與結果解釋，並藉由互動式網站將方法與結果以更具可讀性的形式呈現。
+                  研究流程涵蓋資料前處理、模型訓練、模型篩選、次層整合與結果解釋。
                 </p>
               </CardContent>
             </Card>
@@ -1967,7 +1962,8 @@ function HomePage({ setCurrentPage }) {
                   <CardTitle className="text-lg">研究動機</CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm leading-7 text-slate-600">
-                  單一模型在不同資料集上的穩定性有限，因此希望透過堆疊整合學習降低模型波動，提升表現一致性。
+                  單一模型在不同資料集上的穩定性有限，因此希望透過堆疊整合學習降低模型波動，提升分類表現。我們提出了勝算加權方法以及逆變異數加權方法，透過直接且解釋性高的加權方式來提升
+                  兩分類資料的分類準確度。
                 </CardContent>
               </Card>
               <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
@@ -1975,8 +1971,8 @@ function HomePage({ setCurrentPage }) {
                   <CardTitle className="text-lg">研究目的</CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm leading-7 text-slate-600">
-                  建立一套可比較、可視覺化、可解釋的二元分類 stacking
-                  研究框架，分析不同整合策略的優勢與限制。
+                  本研究旨在針對二元分類問題，提出一種「基於勝算的堆疊演算法」（Odds-Based Stacking Algorithm）。
+                  該方法透過計算k個基礎模型之預測勝算（Odds）及其比例關係，將其轉化為堆疊過程中的加權依據，進而建構具備統計解釋性的水平堆疊（Horizontal Stacking）機制。
                 </CardContent>
               </Card>
             </div>
