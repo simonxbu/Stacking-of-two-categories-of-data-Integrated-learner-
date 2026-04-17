@@ -1,0 +1,553 @@
+//研究流程頁面
+function ResearchPage() {
+  const [datasetKey, setDatasetKey] = useState("personality");
+  const current = datasetMeta[datasetKey];
+
+  const { bestModel, worstModel } = useMemo(() => {
+    if (!current?.models?.length) return { bestModel: null, worstModel: null };
+    let best = current.models[0];
+    let worst = current.models[0];
+    current.models.forEach((m) => {
+      if (m.f1 > best.f1) best = m;
+      if (m.f1 < worst.f1) worst = m;
+    });
+    return { bestModel: best, worstModel: worst };
+  }, [current.models]);
+
+  const confusionCells = [
+    { label: "TN", value: current.confusion[0].predictedNegative },
+    { label: "FP", value: current.confusion[0].predictedPositive },
+    { label: "FN", value: current.confusion[1].predictedNegative },
+    { label: "TP", value: current.confusion[1].predictedPositive },
+  ];
+  const lineData = useMemo(() => {
+  return [...current.models].sort((a, b) => b.f1 - a.f1);
+  }, [current]);
+  const lineData2 = useMemo(() => {
+  return [...current.models].sort((a, b) => b.precision - a.precision);
+  }, [current]);
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <SectionTitle
+        eyebrow="研究流程"
+        title="資料介紹、基礎模型結果與堆疊模型分析"
+        description="本頁整合原本的實驗結果與進階分析，並把資料集介紹一併移入，切換資料集時，下方所有結果會同步切換。"
+      />
+
+      <div className="mt-8">
+        <DatasetSwitcher
+          datasetKey={datasetKey}
+          setDatasetKey={setDatasetKey}
+        />
+      </div>
+
+      <div className="mt-10 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Database className="h-5 w-5 text-[#93b5c6]" />
+              資料集介紹
+            </CardTitle>
+            <CardDescription>
+              研究流程頁最上方先說明目前資料集背景與分布
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+              <div className="text-sm text-[#93b5c6] font-medium">
+                目前資料集
+              </div>
+              <div className="mt-2 text-2xl font-bold text-slate-900">
+                {current.label}
+              </div>
+              <div className="mt-1 text-slate-500">{current.subtitle}</div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl bg-white/90 p-4">
+                  <div className="text-sm text-slate-500">資料筆數</div>
+                  <div className="mt-1 text-xl font-semibold text-slate-900">
+                    {current.size}
+                  </div>
+                </div>
+                <div className="rounded-2xl bg-white/90 p-4">
+                  <div className="text-sm text-slate-500">特徵數</div>
+                  <div className="mt-1 text-xl font-semibold text-slate-900">
+                    {current.features}
+                  </div>
+                </div>
+              </div>
+              <p className="mt-4 text-sm leading-7 text-slate-600">
+                {current.note}
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-slate-200 p-4">
+                <div className="text-slate-500 text-sm">ROC AUC</div>
+                <div className="mt-1 text-2xl font-semibold text-slate-900">
+                  {current.auc.toFixed(3)}
+                </div>
+              </div>
+              <div className="rounded-2xl border border-slate-200 p-4">
+                <div className="text-slate-500 text-sm">PR AUC / AP</div>
+                <div className="mt-1 text-2xl font-semibold text-slate-900">
+                  {current.ap.toFixed(3)}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle>目標變數分布</CardTitle>
+            <CardDescription>隨資料集切換同步更新</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={current.classData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={110}
+                    innerRadius={55}
+                    paddingAngle={2}
+                  >
+                    <Cell fill="#93b5c6" />
+                    <Cell fill="#d7816a" />
+                  </Pie>
+                  <Tooltip
+                    content={({ active, payload }) => {
+                      if (!active || !payload || !payload.length || !payload[0]?.payload) {
+                        return null;
+                      }
+
+                      const data = payload[0].payload;
+
+                      return (
+                        <div
+                          style={{
+                            backgroundColor: "#fff",
+                            border: "1px solid #ddd",
+                            padding: "12px 16px",
+                            borderRadius: "10px",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                          }}
+                        > 
+                          <p
+                            style={{
+                              margin: 0,
+                              color: data.color,
+                              fontSize: "14px",
+                              fontWeight: "500",//字體的粗度(越往上越粗)
+                            }}
+                          >
+                            {data.name}{"： "}{data.value}{" ("}{data.percentage}{")"}
+                          </p>
+                        </div>
+                      );
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-4 flex items-center justify-center gap-6 text-sm">
+              <div className="flex items-center gap-2">
+                <span
+                  className="inline-block h-3 w-3"
+                  style={{ backgroundColor: "#93b5c6" }}
+                />
+                <span className="text-slate-700">
+                  {current.classData[0]?.name}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span
+                  className="inline-block h-3 w-3"
+                  style={{ backgroundColor: "#d7816a" }}
+                />
+                <span className="text-slate-700">
+                  {current.classData[1]?.name}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle>基礎模型訓練表現</CardTitle>
+            <CardDescription>{current.label} 的基礎模型結果</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-y-auto max-h-80 rounded-2xl border border-slate-200">
+              <table className="min-w-full text-left text-sm">
+                <thead className="bg-slate-50 text-slate-700">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Model</th>
+                    <th className="px-4 py-3 font-medium">Accuracy</th>
+                    <th className="px-4 py-3 font-medium">Precision</th>
+                    <th className="px-4 py-3 font-medium">Recall</th>
+                    <th className="px-4 py-3 font-medium">F1</th>
+                    <th className="px-4 py-3 font-medium">ROC_AUC</th>
+                    <th className="px-4 py-3 font-medium">PR_AUC</th>
+                    <th className="px-4 py-3 font-medium">Best_Threshold</th>
+                  </tr>
+                </thead>
+                 {/*px-數字:欄位下方數字的位置，數字越高越往右*/}
+                <tbody className="divide-y divide-slate-200 bg-white text-slate-600">
+                  {current.models.map((row) => (
+                    <tr key={row.name}>
+                      <td className="px-4 py-3 font-medium text-slate-900">
+                        {row.name}
+                      </td>
+                      <td className="px-5 py-3">{row.accuracy.toFixed(3)}</td>
+                      <td className="px-5 py-3">{row.precision.toFixed(3)}</td>
+                      <td className="px-5 py-3">{row.recall.toFixed(3)}</td>
+                      <td className="px-5 py-3 font-semibold text-[#d7816a]">
+                        {row.f1.toFixed(3)}
+                      </td>
+                      <td className="px-5 py-3">{row.ROC_AUC.toFixed(3)}</td>
+                      <td className="px-5 py-3">{row.PR_AUC.toFixed(3)}</td>
+                      <td className="px-6 py-3">{row.Best_Threshold.toFixed(3)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle>基礎模型摘要</CardTitle>
+            <CardDescription>快速掌握目前資料集的關鍵觀察</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm text-slate-600">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-2xl bg-[#f5efe4] p-4 shadow-sm">
+                <div className="text-slate-500">最佳模型</div>
+                <div className="mt-1 text-xl font-bold text-slate-900">
+                  {bestModel?.name}
+                </div>
+                <div className="text-[#d7816a]">
+                  F1 = {bestModel?.f1.toFixed(3)}
+                </div>
+              </div>
+              <div className="rounded-2xl bg-[#f5efe4] p-4 shadow-sm">
+                <div className="text-slate-500">最低表現</div>
+                <div className="mt-1 text-xl font-bold text-slate-900">
+                  {worstModel?.name}
+                </div>
+                <div className="text-rose-600">
+                  F1 = {worstModel?.f1.toFixed(3)}
+                </div>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-slate-200 p-4 leading-7">
+              基礎模型結果會隨資料集切換同步更新，可直接拿來對照下方堆疊模型分析是否真的帶來穩定提升。
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/*模型 F1 比較圖*/ }
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle>模型 F1 比較圖</CardTitle>
+            <CardDescription>
+              比較各基礎模型在目前資料集上的排序趨勢
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={lineData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="name"
+                    angle={-20}
+                    textAnchor="end"
+                    height={80}
+                    interval={0}
+                  />
+                  <YAxis domain={[0.4, 1]} />
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="f1"
+                    stroke="#93b5c6"
+                    strokeWidth={3}
+                    dot={{ r: 4 , fill: "#d7816a", stroke: "#93b5c6", strokeWidth: 2 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/*Precision / Recall 對比圖*/ }
+        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle>Precision / Recall 對比圖</CardTitle>
+            <CardDescription>
+              觀察不同模型在預測率與召回率上的取捨
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto py-4">
+              <div className="min-w-[1200px] px-6">
+                <ResponsiveContainer width="100%" height={320}>
+                  <BarChart
+                    data={lineData2}
+                    margin={{ top: 20, right: 30, left: 0, bottom: 20 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="name"
+                      angle={-20}
+                      textAnchor="end"
+                      height={80}
+                      interval={0}
+                    />
+                    <YAxis domain={[0.4, 1]} />
+                    <Tooltip />
+                    <Legend />
+                    <Bar
+                      dataKey="precision"
+                      fill="#93b5c6"
+                      radius={[8, 8, 0, 0]}
+                    />
+                    <Bar
+                      dataKey="recall"
+                      fill="#d7816a"
+                      radius={[8, 8, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="mt-10">
+        <SectionTitle
+          eyebrow="堆疊模型結果"
+          title="進階分析與整合模型表現"
+          description="以下內容整合原本進階分析頁的圖表，並與上方基礎模型結果放在同一個資料集上下文中。"
+        />
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Binary className="h-5 w-5 text-[#93b5c6]" />
+              混淆矩陣
+            </CardTitle>
+            <CardDescription>
+              用四格卡片快速判讀 TP / TN / FP / FN
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              {confusionCells.map((cell, idx) => (
+                <div
+                  key={cell.label}
+                  className={`rounded-3xl p-6 ${idx === 0 || idx === 3 ? "bg-[#93b5c6] text-white" : "bg-slate-100 text-slate-900"}`}
+                >
+                  <div className="text-sm opacity-80">{cell.label}</div>
+                  <div className="mt-2 text-3xl font-bold">{cell.value}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200">
+              <table className="min-w-full text-sm">
+                <thead className="bg-slate-50 text-slate-600">
+                  <tr>
+                    <th className="px-4 py-3 text-left">Actual</th>
+                    <th className="px-4 py-3 text-left">Predicted Negative</th>
+                    <th className="px-4 py-3 text-left">Predicted Positive</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white text-slate-700">
+                  {current.confusion.map((row) => (
+                    <tr key={row.actual} className="border-t border-slate-200">
+                      <td className="px-4 py-3 font-medium">{row.actual}</td>
+                      <td className="px-4 py-3">{row.predictedNegative}</td>
+                      <td className="px-4 py-3">{row.predictedPositive}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <FlaskConical className="h-5 w-5 text-[#93b5c6]" />
+              單一模型 vs Stacking 雷達圖
+            </CardTitle>
+            <CardDescription>
+              用視覺化方式展示整合模型在多面向指標上的優勢
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-96 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <RadarChart data={current.radar}>
+                  <PolarGrid />
+                  <PolarAngleAxis dataKey="metric" />
+                  <PolarRadiusAxis />
+                  <Radar
+                    name="Best Base Model"
+                    dataKey="base"
+                    stroke="#93b5c6"
+                    fill="#93b5c6"
+                    fillOpacity={0.25}
+                  />
+                  <Radar
+                    name="Stacking Model"
+                    dataKey="stack"
+                    stroke="#d7816a"
+                    fill="#d7816a"
+                    fillOpacity={0.3}
+                  />
+                  <Tooltip />
+                  <Legend />
+                </RadarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle>ROC Curve</CardTitle>
+            <CardDescription>
+              以 FPR 與 TPR 描述分類器的區辨能力
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={current.roc}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" dataKey="fpr" domain={[0, 1]} />
+                  <YAxis type="number" dataKey="tpr" domain={[0, 1]} />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="tpr"
+                    name="ROC"
+                    stroke="#93b5c6"
+                    strokeWidth={3}
+                    dot={{ r: 4, fill: "#f0cf65", stroke: "#93b5c6", strokeWidth: 2  }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle>Precision-Recall Curve</CardTitle>
+            <CardDescription>
+              在不平衡資料下更能反映正類預測品質
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={current.pr}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" dataKey="recall" domain={[0, 1]} />
+                  <YAxis type="number" dataKey="precision" domain={[0, 1]} />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="precision"
+                    name="PR"
+                    stroke="#d7816a"
+                    strokeWidth={3}
+                    dot={{ r: 4, fill: "#f0cf65", stroke: "#d7816a", strokeWidth: 2  }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle>OOF Prediction 視覺化</CardTitle>
+            <CardDescription>
+              比較每個 fold 的最佳單模與 stacking 表現
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={current.oof}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="fold" />
+                  <YAxis domain={[0.5, 0.95]} />
+                  <Tooltip />
+                  <Legend />
+                  <Bar
+                    dataKey="base"
+                    name="Best Base"
+                    fill="#93b5c6"
+                    radius={[8, 8, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="stack"
+                    name="Stacking"
+                    fill="#d7816a"
+                    radius={[8, 8, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle>分析發現</CardTitle>
+            <CardDescription>搭配堆疊模型結果的口頭說明重點</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm leading-7 text-slate-600">
+            <div className="rounded-2xl bg-[#f5efe4] p-4 shadow-sm">
+              混淆矩陣可幫助辨識模型錯誤型態，特別是 false positive 與 false
+              negative 的實際代價差異。
+            </div>
+            <div className="rounded-2xl bg-[#f5efe4] p-4 shadow-sm">
+              ROC 適合看整體區辨能力，PR
+              曲線則更適合不平衡資料情境下的正類預測品質評估。
+            </div>
+            
+            <div className="rounded-2xl bg-[#f5efe4] p-4 shadow-sm">
+              OOF 視覺化能說明 stacking 是否在各 fold
+              上穩定優於單一模型，而不是只在單次切分下偶然提升。
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </section>
+  );
+}

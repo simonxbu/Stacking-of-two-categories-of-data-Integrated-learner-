@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import katex from "katex";
 import "katex/dist/katex.min.css";
+import allStackingResults from "./all_stacking_results_combined.json";
 //import DatasetSwitcher from "./DatasetSwitcher";
 import {
   Card,
@@ -57,6 +58,8 @@ import {
   Binary,
   BarChart3,
   ExternalLink,
+  ChartBarIcon,
+  Cat,
 } from "lucide-react";
 
 //頁面連結按鈕(icon是旁邊的小圖案)
@@ -79,122 +82,186 @@ const datasetMeta = {
     size: "2,900",
     features: "7",
     classData: [
-      { name: "Extrovert", value: 1491, percentage: "51.4%" },
-      { name: "Introvert ", value: 1409, percentage: "48.6%" },
+      { name: "Extrovert", value: 1491, percentage: "51.4%", color: "#93b5c6"},
+      { name: "Introvert ", value: 1409, percentage: "48.6%", color: "#d7816a" },
     ],
     //實驗結果-基礎模型訓練表現(已改)
     models: [
       {
         name: "Logistic_regression",
-        accuracy: 0.938,
-        precision: 0.949,
-        recall: 0.93,
-        f1: 0.939,
+        accuracy: 0.9379, 
+        precision: 0.9486, 
+        recall: 0.9295, 
+        f1: 0.9390, 
+        ROC_AUC: 0.9455,
+        PR_AUC: 0.9426,
+        Best_Threshold: 0.62,
+        MCC:0.8760,
       },
       {
         name: "Decision_tree",
-        accuracy: 0.928,
-        precision: 0.948,
-        recall: 0.909,
-        f1: 0.928,
+        accuracy: 0.9276, 
+        precision: 0.9476, 
+        recall: 0.9094, 
+        f1: 0.9281, 
+        ROC_AUC: 0.9532, 
+        PR_AUC: 0.9584,
+        Best_Threshold: 0.55,
+        MCC:0.8560,
       },
       {
         name: "Random_forest",
-        accuracy: 0.94,
-        precision: 0.952,
-        recall: 0.93,
-        f1: 0.941,
+        accuracy: 0.9397,
+        precision: 0.9519,
+        recall: 0.9295,
+        f1: 0.9406,
+        ROC_AUC: 0.9717,
+        PR_AUC: 0.9750,
+        Best_Threshold: 0.81,
+        MCC:0.8796,
       },
       {
         name: "SVM",
-        accuracy: 0.936,
-        precision: 0.952,
-        recall: 0.923,
-        f1: 0.937,
+        accuracy: 0.9362,
+        precision: 0.9516, 
+        recall: 0.9228, 
+        f1: 0.9370, 
+        ROC_AUC: 0.9682 , 
+        PR_AUC: 0.9710 ,
+        Best_Threshold: 0.91,
+        MCC:0.8728,
       },
       {
         name: "Xgboost",
-        accuracy: 0.94,
-        precision: 0.951,
-        recall: 0.93,
-        f1: 0.941,
+        accuracy: 0.9397, 
+        precision: 0.9519, 
+        recall: 0.9295, 
+        f1: 0.9406, 
+        ROC_AUC: 0.9723 , 
+        PR_AUC: 0.9771 ,
+        Best_Threshold: 0.62,
+        MCC:0.8796,
       },
       {
         name: "Lightgbm",
-        accuracy: 0.934,
-        precision: 0.952,
-        recall: 0.919,
-        f1: 0.935,
+        accuracy: 0.9345, 
+        precision: 0.9514, 
+        recall: 0.9195, 
+        f1: 0.9352, 
+        ROC_AUC: 0.9681 , 
+        PR_AUC: 0.9730 ,
+        Best_Threshold: 0.72,
+        MCC:0.8695,
       },
       {
         name: "Catboost",
-        accuracy: 0.938,
-        precision: 0.952,
-        recall: 0.926,
-        f1: 0.939,
+        accuracy: 0.9379, 
+        precision: 0.9517, 
+        recall: 0.9262,
+        f1: 0.9399, 
+        ROC_AUC: 0.9718 , 
+        PR_AUC: 0.9766 ,
+        Best_Threshold: 0.78,
+        MCC:0.8762,
       },
       {
         name: "MLP",
-        accuracy: 0.94,
-        precision: 0.955,
-        recall: 0.93,
-        f1: 0.941,
+        accuracy: 0.9379, 
+        precision: 0.9519, 
+        recall: 0.9295, 
+        f1: 0.9406, 
+        ROC_AUC: 0.9511, 
+        PR_AUC: 0.9512,
+        Best_Threshold: 0.05,
+        MCC:0.8796,
       },
       {
         name: "KNN",
-        accuracy: 0.941,
-        precision: 0.954,
-        recall: 0.93,
-        f1: 0.942,
+        accuracy: 0.9414, 
+        precision: 0.9552, 
+        recall: 0.9295, 
+        f1: 0.9422, 
+        ROC_AUC: 0.9717, 
+        PR_AUC: 0.9741,
+        Best_Threshold: 0.83,
+        MCC:0.8831,
       },
       {
         name: "Extra_trees",
-        accuracy: 0.929,
-        precision: 0.952,
-        recall: 0.906,
-        f1: 0.929,
+        accuracy: 0.9293, 
+        precision: 0.9541, 
+        recall: 0.9060, 
+        f1: 0.9294, 
+        ROC_AUC: 0.9732, 
+        PR_AUC: 0.9769,
+        Best_Threshold: 0.85,
+        MCC:0.8599,
       },
       {
         name: "Gradient_boosting",
-        accuracy: 0.94,
-        precision: 0.952,
-        recall: 0.93,
-        f1: 0.941,
+        accuracy: 0.9397, 
+        precision: 0.9519, 
+        recall: 0.9295, 
+        f1: 0.9406, 
+        ROC_AUC: 0.9723, 
+        PR_AUC: 0.9773,
+        Best_Threshold: 0.55,
+        MCC:0.8796,
       },
       {
         name: "Hist_gradient_boosting",
-        accuracy: 0.94,
-        precision: 0.949,
-        recall: 0.93,
-        f1: 0.941,
+        accuracy: 0.9397, 
+        precision: 0.9519, 
+        recall: 0.9295, 
+        f1: 0.9406, 
+        ROC_AUC: 0.9735, 
+        PR_AUC: 0.9762,
+        Best_Threshold: 0.62,
+        MCC:0.8796,
       },
       {
         name: "Gaussian_nb",
-        accuracy: 0.938,
-        precision: 0.949,
-        recall: 0.93,
-        f1: 0.939,
+        accuracy: 0.9379, 
+        precision: 0.9486, 
+        recall: 0.9295, 
+        f1: 0.9390, 
+        ROC_AUC: 0.9142, 
+        PR_AUC: 0.9002,
+        Best_Threshold: 0.01,
+        MCC:0.8760,
       },
       {
         name: "Bernoulli_nb",
-        accuracy: 0.938,
-        precision: 0.949,
-        recall: 0.93,
-        f1: 0.939,
+        accuracy: 0.9379, 
+        precision: 0.9486, 
+        recall: 0.9295, 
+        f1: 0.9390, 
+        ROC_AUC: 0.9253, 
+        PR_AUC: 0.9312,
+        Best_Threshold: 0.01,
+        MCC:0.8760,
       },
       {
         name: "LDA",
-        accuracy: 0.938,
-        precision: 0.949,
-        recall: 0.93,
-        f1: 0.939,
+        accuracy: 0.9379, 
+        precision: 0.9486, 
+        recall: 0.9295, 
+        f1: 0.9390, 
+        ROC_AUC: 0.9467, 
+        PR_AUC: 0.9429,
+        Best_Threshold: 0.69,
+        MCC:0.8760,
       },
       {
         name: "QDA",
-        accuracy: 0.94,
-        precision: 0.952,
-        recall: 0.93,
-        f1: 0.941,
+        accuracy: 0.9397, 
+        precision: 0.9519, 
+        recall: 0.9295, 
+        f1: 0.9406, 
+        ROC_AUC: 0.9135, 
+        PR_AUC: 0.8994,
+        Best_Threshold: 0.09,
+        MCC:0.8796,
       },
     ],
     //進階分析-雷達圖(未改)
@@ -203,14 +270,69 @@ const datasetMeta = {
       { metric: "Precision", base: 76, stack: 85 },
       { metric: "Recall", base: 72, stack: 83 },
       { metric: "F1", base: 74, stack: 87 },
-      { metric: "Stability", base: 68, stack: 84 },
+      { metric: "MCC", base: 68, stack: 84 },
     ],
-    //混淆矩陣(未改)
-    confusion: [
-      { actual: "Negative", predictedNegative: 7132, predictedPositive: 182 },
-      { actual: "Positive", predictedNegative: 336, predictedPositive: 588 },
-    ],
-    //ROC Curve(未改)
+    //混淆矩陣(已改)
+    confusionMatrix: {
+      base: {
+        rank_4: {
+          hgb: { cm: [[268, 14], [21, 277]] },
+          gb: { cm: [[268, 14], [21, 277]] },
+          k: {cm:[[268, 14], [21, 277]]},
+        },
+        rank_f1_top7: {
+          hgb: { cm: [[268, 14], [21, 277]] },
+          xgb: { cm: [[268, 14], [21, 277]] },
+          gb: { cm: [[268, 14], [21, 277]] },
+          k: { cm: [[268, 14], [21, 277]] },
+          rf: { cm: [[267, 15], [21, 277]] },
+          m: { cm: [[268, 14], [21, 277]] },
+          q: { cm: [[268, 14], [21, 277]] },
+        },
+        rank_f1_top12: {
+          hgb: { cm: [[268, 14], [21, 277]] },
+          xgb: { cm: [[268, 14], [21, 277]] },
+          gb: { cm: [[268, 14], [21, 277]] },
+          cat: { cm: [[267, 15], [21, 277]] },
+          k: { cm: [[268, 14], [21, 277]] },
+          rf: { cm: [[267, 15], [21, 277]] },
+          m: { cm: [[268, 14], [21, 277]] },
+          l: { cm: [[267, 15], [21, 277]] },
+          lr: { cm: [[267, 15], [21, 277]] },
+          gnb: { cm: [[267, 15], [21, 277]] },
+          bnb: { cm: [[267, 15], [21, 277]] },
+          q: { cm: [[268, 14], [21, 277]] },
+        },
+      },
+
+      stacking: {
+        rank_4: {
+          stack_odds: { cm: [[268, 14], [21, 277]] },
+          stack_avg: { cm: [[268, 14], [21, 277]] },
+          stack_inv_var: { cm: [[268, 14], [21, 277]] },
+          stack_logistic: { cm: [[268, 14], [21, 277]] },
+          stack_catboost: { cm: [[270, 12], [23, 275]] },
+          stack_xgboost: { cm: [[270, 12], [21, 277]] },
+        },
+        rank_f1_top7: {
+          stack_xgboost: { cm: [[269, 13], [22, 276]] },
+          stack_logistic: { cm: [[268, 14], [21, 277]] },
+          stack_inv_var: { cm: [[268, 14], [21, 277]] },
+          stack_avg: { cm: [[268, 14], [21, 277]] },
+          stack_catboost: { cm: [[238, 44], [20, 278]] },
+          stack_odds: { cm: [[268, 14], [21, 277]] },
+        },
+        rank_f1_top12: {
+          stack_xgboost: { cm: [[221, 61], [11, 287]] },
+          stack_catboost: { cm: [[206, 76], [8, 290]] },
+          stack_logistic: { cm: [[268, 14], [21, 277]] },
+          stack_inv_var: { cm: [[267, 15], [21, 277]] },
+          stack_avg: { cm: [[267, 15], [21, 277]] },
+          stack_odds: { cm: [[267, 15], [21, 277]] },
+        },
+      },
+    },
+    //ROC Curve(應改成圖表)
     roc: [
       { fpr: 0.0, tpr: 0.0 },
       { fpr: 0.03, tpr: 0.39 },
@@ -220,7 +342,7 @@ const datasetMeta = {
       { fpr: 0.35, tpr: 0.9 },
       { fpr: 1.0, tpr: 1.0 },
     ],
-    //Precision-Recall Curve(未改)
+    //Precision-Recall Curve(應改成圖表)
     pr: [
       { recall: 0.0, precision: 1.0 },
       { recall: 0.18, precision: 0.86 },
@@ -240,8 +362,6 @@ const datasetMeta = {
     ],
     //數據與流程-目前資料集下方文字說明(未改)
     note: "類別不平衡明顯，適合觀察 stacking 是否能同時改善 recall 與整體 F1 表現。",
-    auc: 0.889,
-    ap: 0.741,
   },
 
   //German Credit
@@ -253,122 +373,186 @@ const datasetMeta = {
     size: "1,000",
     features: "20",
     classData: [
-      { name: "Good", value: 700, percentage: "70%" },
-      { name: "Bad", value: 300, percentage: "30%" },
+      { name: "Good", value: 700, percentage: "70%", color: "#93b5c6" },
+      { name: "Bad", value: 300, percentage: "30%", color: "#d7816a" },
     ],
     //實驗結果-基礎模型訓練表現(已改)
     models: [
       {
         name: "Logistic_regression",
         accuracy: 0.725,
-        precision: 0.81,
-        recall: 0.708,
-        f1: 0.756,
+        precision: 0.8095,
+        recall: 0.7083,
+        f1: 0.7556,
+        ROC_AUC: 0.8173,
+        PR_AUC: 0.8736,
+        Best_Threshold:0.54,
+        MCC:0.4496,
       },
       {
         name: "Decision_tree",
         accuracy: 0.675,
-        precision: 0.765,
-        recall: 0.667,
-        f1: 0.711,
+        precision: 0.7619,
+        recall: 0.6667,
+        f1: 0.7111,
+        ROC_AUC: 0.7545,
+        PR_AUC: 0.8244,
+        Best_Threshold:0.38,
+        MCC:0.3474,
       },
       {
         name: "Random_forest",
         accuracy: 0.755,
-        precision: 0.755,
+        precision: 0.7554,
         recall: 0.875,
-        f1: 0.811,
+        f1: 0.8108,
+        ROC_AUC: 0.8222,
+        PR_AUC: 0.8727,
+        Best_Threshold:0.46,
+        MCC:0.4788,
       },
       {
         name: "SVM",
         accuracy: 0.735,
-        precision: 0.813,
+        precision: 0.8131,
         recall: 0.725,
-        f1: 0.767,
+        f1: 0.7665,
+        ROC_AUC: 0.8163,
+        PR_AUC: 0.8747,
+        Best_Threshold:0.71,
+        MCC:0.4665,
       },
       {
         name: "Xgboost",
         accuracy: 0.735,
-        precision: 0.796,
+        precision: 0.7965,
         recall: 0.75,
-        f1: 0.773,
+        f1: 0.7725,
+        ROC_AUC: 0.8264,
+        PR_AUC: 0.8723,
+        Best_Threshold:0.69,
+        MCC:0.4570,
       },
       {
         name: "Lightgbm",
         accuracy: 0.765,
-        precision: 0.787,
-        recall: 0.833,
-        f1: 0.81,
+        precision: 0.7874,
+        recall: 0.8333,
+        f1: 0.8097,
+        ROC_AUC: 0.8108,
+        PR_AUC: 0.8536,
+        Best_Threshold:0.62,
+        MCC:0.5046,
       },
       {
         name: "Catboost",
         accuracy: 0.76,
-        precision: 0.773,
+        precision: 0.7727,
         recall: 0.85,
-        f1: 0.81,
+        f1: 0.8095,
+        ROC_AUC: 0.8163,
+        PR_AUC: 0.8626,
+        Best_Threshold:0.46,
+        MCC:0.4912,
       },
       {
         name: "MLP",
         accuracy: 0.72,
-        precision: 0.814,
-        recall: 0.692,
-        f1: 0.748,
+        precision: 0.8137,
+        recall: 0.6917,
+        f1: 0.7477,
+        ROC_AUC: 0.7911,
+        PR_AUC: 0.8602,
+        Best_Threshold:0.8,
+        MCC:0.4451,
       },
       {
         name: "KNN",
         accuracy: 0.66,
-        precision: 0.81,
-        recall: 0.567,
-        f1: 0.667,
+        precision: 0.8095,
+        recall: 0.5667,
+        f1: 0.6667,
+        ROC_AUC: 0.7787,
+        PR_AUC: 0.8322,
+        Best_Threshold:0.76,
+        MCC:0.3639,
       },
       {
         name: "Extra_trees",
         accuracy: 0.765,
-        precision: 0.766,
+        precision: 0.7664,
         recall: 0.875,
-        f1: 0.817,
+        f1: 0.8171,
+        ROC_AUC: 0.8098,
+        PR_AUC: 0.8560,
+        Best_Threshold:0.3,
+        MCC:0.5010,
       },
       {
         name: "Gradient_boosting",
         accuracy: 0.725,
-        precision: 0.798,
+        precision: 0.7982,
         recall: 0.725,
-        f1: 0.76,
+        f1: 0.7598,
+        ROC_AUC: 0.8173,
+        PR_AUC: 0.8653,
+        Best_Threshold:0.7,
+        MCC:0.4427,
       },
       {
         name: "Hist_gradient_boosting",
         accuracy: 0.7,
-        precision: 0.826,
-        recall: 0.633,
-        f1: 0.717,
+        precision: 0.8261,
+        recall: 0.6333,
+        f1: 0.7170,
+        ROC_AUC: 0.7960,
+        PR_AUC: 0.8427,
+        Best_Threshold:0.73,
+        MCC:0.4259,
       },
       {
         name: "Gaussian_nb",
         accuracy: 0.735,
-        precision: 0.777,
-        recall: 0.783,
-        f1: 0.78,
+        precision: 0.7769,
+        recall: 0.7833,
+        f1: 0.7801,
+        ROC_AUC: 0.7697,
+        PR_AUC: 0.8331,
+        Best_Threshold:0.32,
+        MCC:0.4468,
       },
       {
         name: "Bernoulli_nb",
         accuracy: 0.73,
-        precision: 0.789,
+        precision: 0.7895,
         recall: 0.75,
-        f1: 0.769,
+        f1: 0.7692,
+        ROC_AUC: 0.7910,
+        PR_AUC: 0.8584,
+        Best_Threshold:0.64,
+        MCC:0.4453,
       },
       {
         name: "LDA",
         accuracy: 0.75,
-        precision: 0.802,
+        precision: 0.8017,
         recall: 0.775,
-        f1: 0.788,
+        f1: 0.7881,
+        ROC_AUC: 0.8090,
+        PR_AUC: 0.8583,
+        Best_Threshold:0.69,
+        MCC:0.4839,
       },
       {
         name: "QDA",
         accuracy: 0.69,
-        precision: 0.759,
-        recall: 0.708,
-        f1: 0.733,
+        precision: 0.7589,
+        recall: 0.7083,
+        f1: 0.7328,
+        ROC_AUC: 0.7582,
+        PR_AUC: 0.8416,
+        Best_Threshold:0.72,
+        MCC:0.3660,
       },
     ],
     radar: [
@@ -376,12 +560,91 @@ const datasetMeta = {
       { metric: "Precision", base: 73, stack: 82 },
       { metric: "Recall", base: 64, stack: 79 },
       { metric: "F1", base: 68, stack: 81 },
-      { metric: "Stability", base: 62, stack: 80 },
+      { metric: "MCC", base: 62, stack: 80 },
     ],
-    confusion: [
-      { actual: "Good", predictedNegative: 126, predictedPositive: 24 },
-      { actual: "Bad", predictedNegative: 31, predictedPositive: 69 },
-    ],
+    //混淆矩陣(未改)
+    confusionMatrix: {
+      base: {
+        rank_4: {
+          xgb: { cm: [[55, 25], [23, 97]] },
+          s: { cm: [[60, 20], [33, 87]] },
+          et: {cm:[[55, 25], [26, 94]]},
+          hgb: {cm:[[60, 20], [41, 79]]},
+        },
+        rank_f1_top4: {
+          rf: { cm: [[52, 28], [21, 99]] },
+          cat: { cm: [[66, 14], [43, 77]] },
+          lgbm: { cm: [[58, 22], [40, 80]] },
+          et: { cm: [[55, 25], [26, 94]] },
+        },
+        rank_f1_top12: {
+          xgb: { cm: [[55, 25], [23, 97]] },
+          rf: { cm: [[52, 28], [21, 99]] },
+          lr: { cm: [[57, 23], [27, 93]] },
+          gb: { cm: [[64, 16], [38, 82]] },
+          s: { cm: [[60, 20], [33, 87]] },
+          cat: { cm: [[66, 14], [43, 77]] },
+          lgbm: { cm: [[58, 22], [40, 80]] },
+          et: { cm: [[55, 25], [26, 94]] },
+          l: { cm: [[57, 23], [24, 96]] },
+          m: { cm: [[56, 24], [33, 87]] },
+          bnb: { cm: [[61, 19], [35, 85]] },
+          gnb: { cm: [[56, 24], [29, 91]] },
+        },
+        rank_f1_top15: {
+          xgb: { cm: [[55, 25], [23, 97]] },
+          rf: { cm: [[52, 28], [21, 99]] },
+          lr: { cm: [[57, 23], [27, 93]] },
+          gb: { cm: [[64, 16], [38, 82]] },
+          s: { cm: [[60, 20], [33, 87]] },
+          cat: { cm: [[66, 14], [43, 77]] },
+          lgbm: { cm: [[58, 22], [40, 80]] },
+          et: { cm: [[55, 25], [26, 94]] },
+          l: { cm: [[57, 23], [24, 96]] },
+          hgb: { cm: [[60, 20], [41, 79]] },
+          m: { cm: [[56, 24], [33, 87]] },
+          bnb: { cm: [[61, 19], [35, 85]] },
+          q: { cm: [[54, 26], [35, 85]] },
+          gnb: { cm: [[56, 24], [29, 91]] },
+          dt: { cm: [[72, 8], [63, 57]] },
+        },
+      },
+
+      stacking: {
+        rank_4: {
+          stack_odds: { cm: [[56, 24], [29, 91]] },
+          stack_logistic: { cm: [[56, 24], [25, 95]] },
+          stack_avg: { cm: [[56, 24], [31, 89]] },
+          stack_inv_var: { cm: [[55, 25], [27, 93]] },
+          stack_xgboost: { cm: [[45, 35], [20, 100]] },
+          stack_catboost: { cm: [[29, 51], [19, 101]] },
+        },
+        rank_f1_top4: {
+          stack_inv_var: { cm: [[60, 20], [37, 83]] },
+          stack_logistic: { cm: [[53, 27], [24, 96]] },
+          stack_avg: { cm: [[52, 28], [24, 96]] },
+          stack_odds: { cm: [[55, 25], [34, 86]] },
+          stack_catboost: { cm: [[46, 34], [24, 96]] },
+          stack_xgboost: { cm: [[53, 27], [25, 95]] },    
+        },
+        rank_f1_top12: {
+          stack_inv_var: { cm: [[62, 18], [38, 82]] },
+          stack_logistic: { cm: [[57, 23], [27, 93]] },
+          stack_avg: { cm: [[61, 19], [39, 81]] },
+          stack_odds: { cm: [[54, 26], [22, 98]] },
+          stack_xgboost: { cm: [[46, 34], [23, 97]] },
+          stack_catboost: { cm: [[42, 38], [20, 100]] }, 
+        },
+        rank_f1_top15: {
+          stack_inv_var: { cm: [[55, 25], [28, 92]] },
+          stack_logistic: { cm: [[59, 21], [29, 91]] },
+          stack_avg: { cm: [[59, 21], [35, 85]] },
+          stack_odds: { cm: [[60, 20], [36, 84]] },
+          stack_catboost: { cm: [[47, 33], [23, 97]] }, 
+          stack_xgboost: { cm: [[42, 38], [22, 98]] },         
+        },
+      },
+    },
     roc: [
       { fpr: 0.0, tpr: 0.0 },
       { fpr: 0.05, tpr: 0.31 },
@@ -408,8 +671,6 @@ const datasetMeta = {
       { fold: "Fold 5", base: 0.645, stack: 0.698 },
     ],
     note: "低樣本且含混合欄位，適合展示模型過度擬合風險與整合模型的穩定化效果。",
-    auc: 0.842,
-    ap: 0.693,
   },
 
   //Sonar, Mines VS. Rocks
@@ -421,122 +682,186 @@ const datasetMeta = {
     size: "208",
     features: "60",
     classData: [
-      { name: "Rock", value: 111, percentage: "53.4%" },
-      { name: "Mine", value: 97, percentage: "46.6%" },
+      { name: "Rock", value: 111, percentage: "53.4%", color: "#93b5c6" },
+      { name: "Mine", value: 97, percentage: "46.6%", color: "#d7816a" },
     ],
-    //實驗結果-基礎模型訓練表現(未改)
+    //實驗結果-基礎模型訓練表現(已改)
     models: [
       {
         name: "Logistic_regression",
-        accuracy: 0.725,
-        precision: 0.81,
-        recall: 0.708,
-        f1: 0.756,
+        accuracy: 0.8372,
+        precision: 0.8636,
+        recall: 0.8261,
+        f1: 0.8444,
+        ROC_AUC: 0.8326,
+        PR_AUC: 0.7938,
+        Best_Threshold:0.5,
+        MCC:0.6746,
       },
       {
         name: "Decision_tree",
-        accuracy: 0.675,
-        precision: 0.765,
-        recall: 0.667,
-        f1: 0.711,
+        accuracy: 0.7209,
+        precision: 0.72,
+        recall: 0.7826,
+        f1: 0.75,
+        ROC_AUC: 0.7975,
+        PR_AUC: 0.8625,
+        Best_Threshold:0.35,
+        MCC:0.4374,
       },
       {
         name: "Random_forest",
-        accuracy: 0.755,
-        precision: 0.755,
-        recall: 0.875,
-        f1: 0.811,
+        accuracy: 0.4651,
+        precision: 0,
+        recall: 0,
+        f1: 0,
+        ROC_AUC: 0.5,
+        PR_AUC: 0.7674,
+        Best_Threshold:0.54,
+        MCC:0,
       },
       {
         name: "SVM",
-        accuracy: 0.735,
-        precision: 0.813,
-        recall: 0.725,
-        f1: 0.767,
+        accuracy: 0.6744,
+        precision: 0.7647,
+        recall: 0.5652,
+        f1: 0.65,
+        ROC_AUC: 0.7717,
+        PR_AUC: 0.8252,
+        Best_Threshold:0.54,
+        MCC:0.3726,
       },
       {
         name: "Xgboost",
-        accuracy: 0.735,
-        precision: 0.796,
-        recall: 0.75,
-        f1: 0.773,
+        accuracy: 0.5349,
+        precision: 0.5349,
+        recall: 1.0,
+        f1: 0.6970,
+        ROC_AUC: 0.5,
+        PR_AUC: 0.7674,
+        Best_Threshold:0.5,
+        MCC:0,
       },
       {
         name: "Lightgbm",
-        accuracy: 0.765,
-        precision: 0.787,
-        recall: 0.833,
-        f1: 0.81,
+        accuracy: 0.5349,
+        precision: 0.5349,
+        recall: 1.0,
+        f1: 0.6970,
+        ROC_AUC: 0.5,
+        PR_AUC: 0.7674,
+        Best_Threshold:0.5,
+        MCC:0,
       },
       {
         name: "Catboost",
-        accuracy: 0.76,
-        precision: 0.773,
-        recall: 0.85,
-        f1: 0.81,
+        accuracy: 0.6279,
+        precision: 0.7692,
+        recall: 0.4348,
+        f1: 0.5556,
+        ROC_AUC: 0.8022,
+        PR_AUC: 0.7888,
+        Best_Threshold:0.4,
+        MCC:0.3093,
       },
       {
         name: "MLP",
-        accuracy: 0.72,
-        precision: 0.814,
-        recall: 0.692,
-        f1: 0.748,
+        accuracy: 0.6512,
+        precision: 0.6818,
+        recall: 0.6522,
+        f1: 0.6667,
+        ROC_AUC: 0.6543,
+        PR_AUC: 0.6704,
+        Best_Threshold:0.45,
+        MCC:0.3015,
       },
       {
         name: "KNN",
-        accuracy: 0.66,
-        precision: 0.81,
-        recall: 0.567,
-        f1: 0.667,
+        accuracy: 0.6279,
+        precision: 0.6296,
+        recall: 0.7391,
+        f1: 0.68,
+        ROC_AUC: 0.7261,
+        PR_AUC: 0.7911,
+        Best_Threshold:0.51,
+        MCC:0.2468,
       },
       {
         name: "Extra_trees",
-        accuracy: 0.765,
-        precision: 0.766,
-        recall: 0.875,
-        f1: 0.817,
+        accuracy: 0.8140,
+        precision: 0.8261,
+        recall: 0.8261,
+        f1: 0.8261,
+        ROC_AUC: 0.8761,
+        PR_AUC: 0.8633,
+        Best_Threshold:0.5,
+        MCC:0.6261,
       },
       {
         name: "Gradient_boosting",
-        accuracy: 0.725,
-        precision: 0.798,
-        recall: 0.725,
-        f1: 0.76,
+        accuracy: 0.8140,
+        precision: 0.8,
+        recall: 0.8696,
+        f1: 0.8333,
+        ROC_AUC: 0.8696,
+        PR_AUC: 0.8556,
+        Best_Threshold:0.5,
+        MCC:0.6264,
       },
       {
         name: "Hist_gradient_boosting",
-        accuracy: 0.7,
-        precision: 0.826,
-        recall: 0.633,
-        f1: 0.717,
+        accuracy: 0.5349,
+        precision: 0.5349,
+        recall: 1.0,
+        f1: 0.6970,
+        ROC_AUC: 0.5,
+        PR_AUC: 0.7674,
+        Best_Threshold:0.5,
+        MCC:0,
       },
       {
         name: "Gaussian_nb",
-        accuracy: 0.735,
-        precision: 0.777,
-        recall: 0.783,
-        f1: 0.78,
+        accuracy: 0.7442,
+        precision: 0.8333,
+        recall: 0.6522,
+        f1: 0.7317,
+        ROC_AUC: 0.8043,
+        PR_AUC: 0.7493,
+        Best_Threshold:0.14,
+        MCC:0.5077,
       },
       {
         name: "Bernoulli_nb",
-        accuracy: 0.73,
-        precision: 0.789,
-        recall: 0.75,
-        f1: 0.769,
+        accuracy: 0.6744,
+        precision: 0.7143,
+        recall: 0.6522,
+        f1: 0.6818,
+        ROC_AUC: 0.6587,
+        PR_AUC: 0.6437,
+        Best_Threshold:0.75,
+        MCC:0.3514,
       },
       {
         name: "LDA",
-        accuracy: 0.75,
-        precision: 0.802,
-        recall: 0.775,
-        f1: 0.788,
+        accuracy: 0.7209,
+        precision: 0.6774,
+        recall: 0.9130,
+        f1: 0.7778,
+        ROC_AUC: 0.8413,
+        PR_AUC: 0.8488,
+        Best_Threshold:0.15,
+        MCC:0.4593,
       },
       {
         name: "QDA",
-        accuracy: 0.69,
-        precision: 0.759,
-        recall: 0.708,
-        f1: 0.733,
+        accuracy: 0.6977,
+        precision: 0.6389,
+        recall: 1.0,
+        f1: 0.7797,
+        ROC_AUC: 0.7891,
+        PR_AUC: 0.8600,
+        Best_Threshold:0.11,
+        MCC:0.4729,
       },
     ],
     radar: [
@@ -544,7 +869,7 @@ const datasetMeta = {
       { metric: "Precision", base: 81, stack: 87 },
       { metric: "Recall", base: 80, stack: 86 },
       { metric: "F1", base: 81, stack: 87 },
-      { metric: "Stability", base: 70, stack: 82 },
+      { metric: "MCC", base: 70, stack: 82 },
     ],
     confusion: [
       { actual: "Rock", predictedNegative: 22, predictedPositive: 5 },
@@ -576,8 +901,6 @@ const datasetMeta = {
       { fold: "Fold 5", base: 0.809, stack: 0.858 },
     ],
     note: "高維低樣本設定對泛化能力要求更高，很適合展示 stacking 在小型資料集下的價值。",
-    auc: 0.903,
-    ap: 0.861,
   },
 
   //Breast Cancer Wisconsin Dataset
@@ -589,122 +912,186 @@ const datasetMeta = {
     size: "569",
     features: "30",
     classData: [
-      { name: "Benign", value: 357, percentage: "62.7%" },
-      { name: "Mailgnant", value: 212, percentage: "37.3%" },
+      { name: "Benign", value: 357, percentage: "62.7%", color: "#93b5c6" },
+      { name: "Mailgnant", value: 212, percentage: "37.3%", color: "#d7816a" },
     ],
     //實驗結果-基礎模型訓練表現(已改)
     models: [
       {
         name: "Logistic_regression",
-        accuracy: 0.956,
-        precision: 0.937,
+        accuracy: 0.9561,
+        precision: 0.9367,
         recall: 1.0,
-        f1: 0.967,
+        f1: 0.9673,
+        ROC_AUC: 0.9946,
+        PR_AUC: 0.9971,
+        Best_Threshold:0.27,
+        MCC:0.9053,
       },
       {
         name: "Decision_tree",
-        accuracy: 0.921,
-        precision: 0.901,
-        recall: 0.986,
-        f1: 0.942,
+        accuracy: 0.9211,
+        precision: 0.9012,
+        recall: 0.9865,
+        f1: 0.9419,
+        ROC_AUC: 0.9777,
+        PR_AUC: 0.9894,
+        Best_Threshold:0.01,
+        MCC:0.8276,
       },
       {
         name: "Random_forest",
-        accuracy: 0.939,
-        precision: 0.972,
-        recall: 0.932,
-        f1: 0.952,
+        accuracy: 0.9386,
+        precision: 0.9718,
+        recall: 0.9324,
+        f1: 0.9517,
+        ROC_AUC: 0.9919,
+        PR_AUC: 0.9957,
+        Best_Threshold:0.44,
+        MCC:0.8689,
       },
       {
         name: "SVM",
-        accuracy: 0.956,
-        precision: 0.937,
+        accuracy: 0.9561,
+        precision: 0.9367,
         recall: 1.0,
-        f1: 0.967,
+        f1: 0.9673,
+        ROC_AUC: 0.9949,
+        PR_AUC: 0.9971,
+        Best_Threshold:0.2,
+        MCC:0.9053,
       },
       {
         name: "Xgboost",
-        accuracy: 0.956,
-        precision: 0.973,
-        recall: 0.959,
-        f1: 0.966,
+        accuracy: 0.9561,
+        precision: 0.9726,
+        recall: 0.9595,
+        f1: 0.9660,
+        ROC_AUC: 0.9912,
+        PR_AUC: 0.9951,
+        Best_Threshold:0.45,
+        MCC:0.9044,
       },
       {
         name: "Lightgbm",
-        accuracy: 0.956,
-        precision: 0.973,
-        recall: 0.959,
-        f1: 0.966,
+        accuracy: 0.9561,
+        precision: 0.9726,
+        recall: 0.9595,
+        f1: 0.9660,
+        ROC_AUC: 0.9875,
+        PR_AUC: 0.9923,
+        Best_Threshold:0.51,
+        MCC:0.9044,
       },
       {
         name: "Catboost",
-        accuracy: 0.956,
-        precision: 0.948,
-        recall: 0.986,
-        f1: 0.967,
+        accuracy: 0.9561,
+        precision: 0.9481,
+        recall: 0.985,
+        f1: 0.9669,
+        ROC_AUC: 0.9922,
+        PR_AUC: 0.9954,
+        Best_Threshold:0.11,
+        MCC:0.9036,
       },
       {
         name: "MLP",
-        accuracy: 0.956,
-        precision: 0.937,
+        accuracy: 0.9561,
+        precision: 0.9367,
         recall: 1.0,
-        f1: 0.967,
+        f1: 0.9673,
+        ROC_AUC: 0.9963,
+        PR_AUC: 0.9980,
+        Best_Threshold:0.14,
+        MCC:0.9053,
       },
       {
         name: "KNN",
-        accuracy: 0.921,
-        precision: 0.892,
+        accuracy: 0.9211,
+        precision: 0.8916,
         recall: 1.0,
-        f1: 0.943,
+        f1: 0.9427,
+        ROC_AUC: 0.9883,
+        PR_AUC: 0.9936,
+        Best_Threshold:0.37,
+        MCC:0.8312,
       },
       {
         name: "Extra_trees",
-        accuracy: 0.947,
-        precision: 0.972,
-        recall: 0.946,
-        f1: 0.959,
+        accuracy: 0.9474,
+        precision: 0.9722,
+        recall: 0.9459,
+        f1: 0.9589,
+        ROC_AUC: 0.9943,
+        PR_AUC: 0.9970,
+        Best_Threshold:0.4,
+        MCC:0.8864,
       },
       {
         name: "Gradient_boosting",
-        accuracy: 0.965,
-        precision: 0.949,
+        accuracy: 0.9649,
+        precision: 0.9487,
         recall: 1.0,
-        f1: 0.974,
+        f1: 0.9737,
+        ROC_AUC: 0.9892,
+        PR_AUC: 0.9933,
+        Best_Threshold:0.01,
+        MCC:0.9240,
       },
       {
         name: "Hist_gradient_boosting",
-        accuracy: 0.965,
-        precision: 0.949,
+        accuracy: 0.9649,
+        precision: 0.9487,
         recall: 1.0,
-        f1: 0.974,
+        f1: 0.9737,
+        ROC_AUC: 0.9916,
+        PR_AUC: 0.9952,
+        Best_Threshold:0.02,
+        MCC:0.9240,
       },
       {
         name: "Gaussian_nb",
-        accuracy: 0.904,
-        precision: 0.932,
-        recall: 0.919,
-        f1: 0.925,
+        accuracy: 0.9035,
+        precision: 0.9315,
+        recall: 0.9189,
+        f1: 0.9252,
+        ROC_AUC: 0.9821,
+        PR_AUC: 0.9905,
+        Best_Threshold:0.01,
+        MCC:0.7895,
       },
       {
         name: "Bernoulli_nb",
-        accuracy: 0.912,
-        precision: 0.957,
-        recall: 0.905,
-        f1: 0.931,
+        accuracy: 0.9123,
+        precision: 0.9571,
+        recall: 0.9054,
+        f1: 0.9306,
+        ROC_AUC: 0.9811,
+        PR_AUC: 0.9898,
+        Best_Threshold:0.65,
+        MCC:0.8141,
       },
       {
         name: "LDA",
-        accuracy: 0.939,
-        precision: 0.986,
-        recall: 0.919,
-        f1: 0.951,
+        accuracy: 0.9386,
+        precision: 0.9855,
+        recall: 0.9189,
+        f1: 0.9510,
+        ROC_AUC: 0.9939,
+        PR_AUC: 0.9968,
+        Best_Threshold:0.92,
+        MCC:0.8728,
       },
       {
         name: "QDA",
-        accuracy: 0.939,
-        precision: 0.935,
-        recall: 0.973,
-        f1: 0.954,
+        accuracy: 0.9386,
+        precision: 0.9351,
+        recall: 0.9730,
+        f1: 0.9536,
+        ROC_AUC: 0.9696,
+        PR_AUC: 0.9640,
+        Best_Threshold:0.4,
+        MCC:0.8643,
       },
     ],
     radar: [
@@ -712,7 +1099,7 @@ const datasetMeta = {
       { metric: "Precision", base: 81, stack: 87 },
       { metric: "Recall", base: 80, stack: 86 },
       { metric: "F1", base: 81, stack: 87 },
-      { metric: "Stability", base: 70, stack: 82 },
+      { metric: "MCC", base: 70, stack: 82 },
     ],
     confusion: [
       { actual: "Rock", predictedNegative: 22, predictedPositive: 5 },
@@ -744,8 +1131,6 @@ const datasetMeta = {
       { fold: "Fold 5", base: 0.809, stack: 0.858 },
     ],
     note: "高維低樣本設定對泛化能力要求更高，很適合展示 stacking 在小型資料集下的價值。",
-    auc: 0.903,
-    ap: 0.861,
   },
 
   //Ionosphere
@@ -757,124 +1142,193 @@ const datasetMeta = {
     size: "351",
     features: "34",
     classData: [
-      { name: "Good", value: 225, percentage: "64.1%" },
-      { name: "Bad", value: 126, percentage: "35.9%" },
+      { name: "Good", value: 225, percentage: "64.1%", color: "#93b5c6" },
+      { name: "Bad", value: 126, percentage: "35.9%", color: "#d7816a" },
     ],
     //實驗結果-基礎模型訓練表現(已改)
     models: [
       {
         name: "Logistic_regression",
-        accuracy: 0.859,
+        accuracy: 0.8592,
         precision: 0.86,
-        recall: 0.935,
-        f1: 0.896,
+        recall: 0.9348,
+        f1: 0.8958,
+        ROC_AUC: 0.9357,
+        PR_AUC: 0.9606,
+        Best_Threshold:0.58,
+        MCC:0.6853,
       },
       {
         name: "Decision_tree",
-        accuracy: 0.817,
-        precision: 0.824,
-        recall: 0.913,
-        f1: 0.866,
+        accuracy: 0.8169,
+        precision: 0.8235,
+        recall: 0.9130,
+        f1: 0.8660,
+        ROC_AUC: 0.7970,
+        PR_AUC: 0.8501,
+        Best_Threshold:0.38,
+        MCC:0.5872,
       },
       {
         name: "Random_forest",
-        accuracy: 0.901,
-        precision: 0.868,
+        accuracy: 0.9014,
+        precision: 0.8679,
         recall: 1.0,
-        f1: 0.929,
+        f1: 0.9293,
+        ROC_AUC: 0.9722,
+        PR_AUC: 0.9838,
+        Best_Threshold:0.3,
+        MCC:0.7905,
       },
       {
         name: "SVM",
-        accuracy: 0.972,
-        precision: 0.978,
-        recall: 0.978,
-        f1: 0.978,
+        accuracy: 0.9718,
+        precision: 0.9783,
+        recall: 0.9783,
+        f1: 0.9783,
+        ROC_AUC: 0.9948,
+        PR_AUC: 0.9971,
+        Best_Threshold:0.76,
+        MCC:0.9383,
       },
       {
         name: "Xgboost",
-        accuracy: 0.93,
-        precision: 0.902,
+        accuracy: 0.9296,
+        precision: 0.9020,
         recall: 1.0,
-        f1: 0.948,
+        f1: 0.9485,
+        ROC_AUC: 0.9617,
+        PR_AUC: 0.9743,
+        Best_Threshold:0.35,
+        MCC:0.8495,
       },
       {
         name: "Lightgbm",
-        accuracy: 0.648,
-        precision: 0.648,
+        accuracy: 0.6479,
+        precision: 0.6479,
         recall: 1.0,
-        f1: 0.786,
+        f1: 0.7863,
+        ROC_AUC: 0.5,
+        PR_AUC: 0.8239,
+        Best_Threshold:0.5,
+        MCC:0,
       },
       {
         name: "Catboost",
-        accuracy: 0.93,
-        precision: 0.902,
+        accuracy: 0.9296,
+        precision: 0.9020,
         recall: 1.0,
-        f1: 0.948,
+        f1: 0.9485,
+        ROC_AUC: 0.9826,
+        PR_AUC: 0.9903,
+        Best_Threshold:0.24,
+        MCC:0.8495,
       },
       {
         name: "MLP",
-        accuracy: 0.901,
-        precision: 0.868,
+        accuracy: 0.9014,
+        precision: 0.8679,
         recall: 1.0,
-        f1: 0.929,
+        f1: 0.9293,
+        ROC_AUC: 0.96,
+        PR_AUC: 0.9761,
+        Best_Threshold:0.64,
+        MCC:0.7905,
       },
       {
         name: "KNN",
-        accuracy: 0.93,
-        precision: 0.918,
-        recall: 0.978,
-        f1: 0.947,
+        accuracy: 0.9296,
+        precision: 0.9184,
+        recall: 0.9783,
+        f1: 0.9474,
+        ROC_AUC: 0.9635,
+        PR_AUC: 0.9796,
+        Best_Threshold:0.76,
+        MCC:0.8451,
       },
       {
         name: "Extra_trees",
-        accuracy: 0.887,
-        precision: 0.952,
-        recall: 0.87,
-        f1: 0.909,
+        accuracy: 0.8873,
+        precision: 0.9524,
+        recall: 0.8696,
+        f1: 0.9091,
+        ROC_AUC: 0.9974,
+        PR_AUC: 0.9869,
+        Best_Threshold:0.68,
+        MCC:0.7672,
       },
       {
         name: "Gradient_boosting",
-        accuracy: 0.901,
-        precision: 0.868,
+        accuracy: 0.9014,
+        precision: 0.8679,
         recall: 1.0,
-        f1: 0.929,
+        f1: 0.9293,
+        ROC_AUC: 0.9713,
+        PR_AUC: 0.9801,
+        Best_Threshold:0.25,
+        MCC:0.7905,
       },
       {
         name: "Hist_gradient_boosting",
-        accuracy: 0.836,
-        precision: 0.836,
+        accuracy: 0.8732,
+        precision: 0.8364,
         recall: 1.0,
-        f1: 0.911,
+        f1: 0.9109,
+        ROC_AUC: 0.9626,
+        PR_AUC: 0.9769,
+        Best_Threshold:0.32,
+        MCC:0.7316,
       },
       {
         name: "Gaussian_nb",
-        accuracy: 0.901,
-        precision: 0.898,
-        recall: 0.957,
-        f1: 0.926,
+        accuracy: 0.9014,
+        precision: 0.8980,
+        recall: 0.9565,
+        f1: 0.9263,
+        ROC_AUC: 0.9487,
+        PR_AUC: 0.9669,
+        Best_Threshold:0.91,
+        MCC:0.7814,
       },
       {
         name: "Bernoulli_nb",
-        accuracy: 0.69,
-        precision: 0.816,
-        recall: 0.674,
-        f1: 0.738,
+        accuracy: 0.6901,
+        precision: 0.8158,
+        recall: 0.6739,
+        f1: 0.7381,
+        ROC_AUC: 0.8070,
+        PR_AUC: 0.8750,
+        Best_Threshold:0.38,
+        MCC:0.3772,
       },
       {
         name: "LDA",
-        accuracy: 0.845,
-        precision: 0.807,
+        accuracy: 0.8451,
+        precision: 0.8070,
         recall: 1.0,
-        f1: 0.893,
+        f1: 0.8932,
+        ROC_AUC: 0.9165,
+        PR_AUC: 0.9368,
+        Best_Threshold:0.23,
+        MCC:0.6723,
       },
-      { name: "QDA", accuracy: 0.944, precision: 0.92, recall: 1.0, f1: 0.958 },
+      { name: "QDA", 
+        accuracy: 0.9437, 
+        precision: 0.92, 
+        recall: 1.0, 
+        f1: 0.9583,
+        ROC_AUC: 0.9887,
+        PR_AUC: 0.9935,
+        Best_Threshold:0.99, 
+        MCC:0.8791,
+      },
     ],
     radar: [
       { metric: "Accuracy", base: 83, stack: 88 },
       { metric: "Precision", base: 81, stack: 87 },
       { metric: "Recall", base: 80, stack: 86 },
       { metric: "F1", base: 81, stack: 87 },
-      { metric: "Stability", base: 70, stack: 82 },
+      { metric: "MCC", base: 70, stack: 82 },
     ],
     confusion: [
       { actual: "Rock", predictedNegative: 22, predictedPositive: 5 },
@@ -906,8 +1360,6 @@ const datasetMeta = {
       { fold: "Fold 5", base: 0.809, stack: 0.858 },
     ],
     note: "高維低樣本設定對泛化能力要求更高，很適合展示 stacking 在小型資料集下的價值。",
-    auc: 0.903,
-    ap: 0.861,
   },
 
   //Adult Income Dataset
@@ -919,122 +1371,186 @@ const datasetMeta = {
     size: "48,842",
     features: "14",
     classData: [
-      { name: "> 50K", value: 37155, percentage: "76.1%" },
-      { name: "≤ 50K", value: 11687, percentage: "23.9%" },
+      { name: "> 50K", value: 37155, percentage: "76.1%", color: "#93b5c6" },
+      { name: "≤ 50K", value: 11687, percentage: "23.9%", color: "#d7816a" },
     ],
     //實驗結果-基礎模型訓練表現(已改)
     models: [
       {
         name: "Logistic_regression",
-        accuracy: 0.841,
-        precision: 0.654,
-        recall: 0.71,
-        f1: 0.681,
+        accuracy: 0.8407,
+        precision: 0.6539,
+        recall: 0.7104,
+        f1: 0.6810,
+        ROC_AUC: 0.9030,
+        PR_AUC: 0.7579,
+        Best_Threshold:0.37,
+        MCC:0.5760,
       },
       {
         name: "Decision_tree",
-        accuracy: 0.746,
-        precision: 0.481,
-        recall: 0.796,
-        f1: 0.6,
+        accuracy: 0.7456,
+        precision: 0.4810,
+        recall: 0.7956,
+        f1: 0.5995,
+        ROC_AUC: 0.8373,
+        PR_AUC: 0.6181,
+        Best_Threshold:0.26,
+        MCC:0.4585,
       },
       {
         name: "Random_forest",
-        accuracy: 0.858,
-        precision: 0.718,
-        recall: 0.668,
-        f1: 0.692,
+        accuracy: 0.8577,
+        precision: 0.7178,
+        recall: 0.6681,
+        f1: 0.6921,
+        ROC_AUC: 0.9128,
+        PR_AUC: 0.7900,
+        Best_Threshold:0.41,
+        MCC:0.6004,
       },
       {
         name: "SVM",
-        accuracy: 0.706,
-        precision: 0.344,
-        recall: 0.25,
-        f1: 0.29,
+        accuracy: 0.7061,
+        precision: 0.3435,
+        recall: 0.2502,
+        f1: 0.2895,
+        ROC_AUC: 0.5376,
+        PR_AUC: 0.2897,
+        Best_Threshold:0.25,
+        MCC:0.1122,
       },
       {
         name: "Xgboost",
-        accuracy: 0.873,
-        precision: 0.751,
-        recall: 0.702,
-        f1: 0.726,
+        accuracy: 0.8730,
+        precision: 0.7510,
+        recall: 0.7019,
+        f1: 0.7256,
+        ROC_AUC: 0.9278,
+        PR_AUC: 0.8269,
+        Best_Threshold:0.44,
+        MCC:0.6437,
       },
       {
         name: "Lightgbm",
-        accuracy: 0.871,
-        precision: 0.756,
-        recall: 0.683,
-        f1: 0.718,
+        accuracy: 0.8713,
+        precision: 0.7556,
+        recall: 0.6835,
+        f1: 0.7177,
+        ROC_AUC: 0.9280,
+        PR_AUC: 0.8268,
+        Best_Threshold:0.46,
+        MCC:0.6360,
       },
       {
         name: "Catboost",
-        accuracy: 0.872,
-        precision: 0.771,
-        recall: 0.661,
-        f1: 0.712,
+        accuracy: 0.8719,
+        precision: 0.7713,
+        recall: 0.6608,
+        f1: 0.7118,
+        ROC_AUC: 0.9263,
+        PR_AUC: 0.8238,
+        Best_Threshold:0.47,
+        MCC:0.6632,
       },
       {
         name: "MLP",
-        accuracy: 0.857,
-        precision: 0.697,
-        recall: 0.715,
-        f1: 0.706,
+        accuracy: 0.8573,
+        precision: 0.6967,
+        recall: 0.7151,
+        f1: 0.7058,
+        ROC_AUC: 0.9166,
+        PR_AUC: 0.7953,
+        Best_Threshold:0.37,
+        MCC:0.6117,
       },
       {
         name: "KNN",
-        accuracy: 0.839,
-        precision: 0.656,
-        recall: 0.687,
-        f1: 0.671,
+        accuracy: 0.8390,
+        precision: 0.6562,
+        recall: 0.6873,
+        f1: 0.6714,
+        ROC_AUC: 0.8992,
+        PR_AUC: 0.7471,
+        Best_Threshold:0.41,
+        MCC:0.5651,
       },
       {
         name: "Extra_trees",
-        accuracy: 0.838,
-        precision: 0.635,
-        recall: 0.756,
-        f1: 0.69,
+        accuracy: 0.8441,
+        precision: 0.6353,
+        recall: 0.7562,
+        f1: 0.6905,
+        ROC_AUC: 0.9029,
+        PR_AUC: 0.7481,
+        Best_Threshold:0.35,
+        MCC:0.5857,
       },
       {
         name: "Gradient_boosting",
-        accuracy: 0.87,
-        precision: 0.764,
-        recall: 0.662,
-        f1: 0.709,
+        accuracy: 0.8700,
+        precision: 0.7636,
+        recall: 0.6617,
+        f1: 0.7090,
+        ROC_AUC: 0.9925,
+        PR_AUC: 0.8215,
+        Best_Threshold:0.47,
+        MCC:0.6285,
       },
       {
         name: "Hist_gradient_boosting",
-        accuracy: 0.872,
-        precision: 0.791,
-        recall: 0.633,
-        f1: 0.703,
+        accuracy: 0.8720,
+        precision: 0.7906,
+        recall: 0.6330,
+        f1: 0.7031,
+        ROC_AUC: 0.9269,
+        PR_AUC: 0.8254,
+        Best_Threshold:0.52,
+        MCC:0.6291,
       },
       {
         name: "Gaussian_nb",
-        accuracy: 0.666,
-        precision: 0.411,
-        recall: 0.91,
-        f1: 0.566,
+        accuracy: 0.6661,
+        precision: 0.4108,
+        recall: 0.9098,
+        f1: 0.5660,
+        ROC_AUC: 0.8516,
+        PR_AUC: 0.7054,
+        Best_Threshold:0.99,
+        MCC:0.4267,
       },
       {
         name: "Bernoulli_nb",
-        accuracy: 0.823,
-        precision: 0.625,
-        recall: 0.651,
-        f1: 0.637,
+        accuracy: 0.8228,
+        precision: 0.6246,
+        recall: 0.6506,
+        f1: 0.6373,
+        ROC_AUC: 0.8784,
+        PR_AUC: 0.7105,
+        Best_Threshold:0.82,
+        MCC:0.5204,
       },
       {
         name: "LDA",
-        accuracy: 0.821,
-        precision: 0.601,
-        recall: 0.749,
-        f1: 0.666,
+        accuracy: 0.8207,
+        precision: 0.6005,
+        recall: 0.7485,
+        f1: 0.6664,
+        ROC_AUC: 0.8896,
+        PR_AUC: 0.7727,
+        Best_Threshold:0.29,
+        MCC:0.5520,
       },
       {
         name: "QDA",
-        accuracy: 0.799,
-        precision: 0.56,
-        recall: 0.75,
-        f1: 0.641,
+        accuracy: 0.7990,
+        precision: 0.5597,
+        recall: 0.7498,
+        f1: 0.6410,
+        ROC_AUC: 0.8741,
+        PR_AUC: 0.6753,
+        Best_Threshold:0.26,
+        MCC:0.5158,
       },
     ],
     radar: [
@@ -1042,7 +1558,7 @@ const datasetMeta = {
       { metric: "Precision", base: 81, stack: 87 },
       { metric: "Recall", base: 80, stack: 86 },
       { metric: "F1", base: 81, stack: 87 },
-      { metric: "Stability", base: 70, stack: 82 },
+      { metric: "MCC", base: 70, stack: 82 },
     ],
     confusion: [
       { actual: "Rock", predictedNegative: 22, predictedPositive: 5 },
@@ -1074,8 +1590,6 @@ const datasetMeta = {
       { fold: "Fold 5", base: 0.809, stack: 0.858 },
     ],
     note: "高維低樣本設定對泛化能力要求更高，很適合展示 stacking 在小型資料集下的價值。",
-    auc: 0.903,
-    ap: 0.861,
   },
 
   //Water Quality
@@ -1087,122 +1601,186 @@ const datasetMeta = {
     size: "3,276",
     features: "10",
     classData: [
-      { name: "Potable", value: 1278, percentage: "39%" },
-      { name: "Not potable", value: 1998, percentage: "61%" },
+      { name: "Potable", value: 1278, percentage: "39%", color: "#93b5c6" },
+      { name: "Not potable", value: 1998, percentage: "61%", color: "#d7816a" },
     ],
-    //實驗結果-基礎模型訓練表現(未改)
+    //實驗結果-基礎模型訓練表現(已改)
     models: [
       {
         name: "Logistic_regression",
-        accuracy: 0.841,
-        precision: 0.654,
-        recall: 0.71,
-        f1: 0.681,
+        accuracy: 0.6037,
+        precision: 0.4444,
+        recall: 0.0154,
+        f1: 0.0299,
+        ROC_AUC: 0.4869,
+        PR_AUC: 0.3962,
+        Best_Threshold:0.46,
+        MCC:0.0120,
       },
       {
         name: "Decision_tree",
-        accuracy: 0.746,
-        precision: 0.481,
-        recall: 0.796,
-        f1: 0.6,
+        accuracy: 0.5625,
+        precision: 0.4568,
+        recall: 0.5714,
+        f1: 0.5077,
+        ROC_AUC: 0.5885,
+        PR_AUC: 0.5231,
+        Best_Threshold:0.45,
+        MCC:0.1252,
       },
       {
         name: "Random_forest",
-        accuracy: 0.858,
-        precision: 0.718,
-        recall: 0.668,
-        f1: 0.692,
+        accuracy: 0.6067,
+        precision: 0.5021,
+        recall: 0.4595,
+        f1: 0.4798,
+        ROC_AUC: 0.5986,
+        PR_AUC: 0.5110,
+        Best_Threshold:0.39,
+        MCC:0.1651,
       },
       {
         name: "SVM",
-        accuracy: 0.706,
-        precision: 0.344,
-        recall: 0.25,
-        f1: 0.29,
+        accuracy: 0.3948,
+        precision: 0.3948,
+        recall: 1.0,
+        f1: 0.5661,
+        ROC_AUC: 0.5,
+        PR_AUC: 0.6974,
+        Best_Threshold:0.5,
+        MCC:0,
       },
       {
         name: "Xgboost",
-        accuracy: 0.873,
-        precision: 0.751,
-        recall: 0.702,
-        f1: 0.726,
+        accuracy: 0.6494,
+        precision: 0.6306,
+        recall: 0.2703,
+        f1: 0.3784,
+        ROC_AUC: 0.6325,
+        PR_AUC: 0.5698,
+        Best_Threshold:0.45,
+        MCC:0.2177,
       },
       {
         name: "Lightgbm",
-        accuracy: 0.871,
-        precision: 0.756,
-        recall: 0.683,
-        f1: 0.718,
+        accuracy: 0.6326,
+        precision: 0.5833,
+        recall: 0.2432,
+        f1: 0.3433,
+        ROC_AUC: 0.6331,
+        PR_AUC: 0.5596,
+        Best_Threshold:0.44,
+        MCC:0.1712,
       },
       {
         name: "Catboost",
-        accuracy: 0.872,
-        precision: 0.771,
-        recall: 0.661,
-        f1: 0.712,
+        accuracy: 0.6418,
+        precision: 0.5741,
+        recall: 0.3591,
+        f1: 0.4418,
+        ROC_AUC: 0.6296,
+        PR_AUC: 0.5680,
+        Best_Threshold:0.53,
+        MCC:0.2100,
       },
       {
         name: "MLP",
-        accuracy: 0.857,
-        precision: 0.697,
-        recall: 0.715,
-        f1: 0.706,
+        accuracy: 0.6753,
+        precision: 0.6075,
+        recall: 0.5019,
+        f1: 0.5497,
+        ROC_AUC: 0.6933,
+        PR_AUC: 0.6213,
+        Best_Threshold:0.48,
+        MCC:0.3027,
       },
       {
         name: "KNN",
-        accuracy: 0.839,
-        precision: 0.656,
-        recall: 0.687,
-        f1: 0.671,
+        accuracy: 0.6509,
+        precision: 0.7083,
+        recall: 0.1969,
+        f1: 0.3082,
+        ROC_AUC: 0.6503,
+        PR_AUC: 0.5909,
+        Best_Threshold:0.43,
+        MCC:0.2252,
       },
       {
         name: "Extra_trees",
-        accuracy: 0.838,
-        precision: 0.635,
-        recall: 0.756,
-        f1: 0.69,
+        accuracy: 0.4619,
+        precision: 0.4173,
+        recall: 0.9151,
+        f1: 0.5732,
+        ROC_AUC: 0.5762,
+        PR_AUC: 0.4963,
+        Best_Threshold:0.38,
+        MCC:0.1166,
       },
       {
         name: "Gradient_boosting",
-        accuracy: 0.87,
-        precision: 0.764,
-        recall: 0.662,
-        f1: 0.709,
+        accuracy: 0.5259,
+        precision: 0.4409,
+        recall: 0.7490,
+        f1: 0.5551,
+        ROC_AUC: 0.5961,
+        PR_AUC: 0.5024,
+        Best_Threshold:0.35,
+        MCC:0.1346,
       },
       {
         name: "Hist_gradient_boosting",
-        accuracy: 0.872,
-        precision: 0.791,
-        recall: 0.633,
-        f1: 0.703,
+        accuracy: 0.6189,
+        precision: 0.5634,
+        recall: 0.2162,
+        f1: 0.3146,
+        ROC_AUC: 0.6290,
+        PR_AUC: 0.5557,
+        Best_Threshold:0.47,
+        MCC:0.1639,
       },
       {
         name: "Gaussian_nb",
-        accuracy: 0.666,
-        precision: 0.411,
-        recall: 0.91,
-        f1: 0.566,
+        accuracy: 0.6189,
+        precision: 0.5634,
+        recall: 0.1544,
+        f1: 0.2424,
+        ROC_AUC: 0.5728,
+        PR_AUC: 0.4901,
+        Best_Threshold:0.57,
+        MCC:0.1201,
       },
       {
         name: "Bernoulli_nb",
-        accuracy: 0.823,
-        precision: 0.625,
-        recall: 0.651,
-        f1: 0.637,
+        accuracy: 0.4710,
+        precision: 0.4154,
+        recall: 0.8340,
+        f1: 0.5546,
+        ROC_AUC: 0.5309,
+        PR_AUC: 0.4183,
+        Best_Threshold:0.34,
+        MCC:0.0823,
       },
       {
         name: "LDA",
-        accuracy: 0.821,
-        precision: 0.601,
-        recall: 0.749,
-        f1: 0.666,
+        accuracy: 0.6037,
+        precision: 0.4444,
+        recall: 0.0154,
+        f1: 0.0299,
+        ROC_AUC: 0.4869,
+        PR_AUC: 0.3963,
+        Best_Threshold:0.46,
+        MCC:0.0120,
       },
       {
         name: "QDA",
-        accuracy: 0.799,
-        precision: 0.56,
-        recall: 0.75,
-        f1: 0.641,
+        accuracy: 0.6753,
+        precision: 0.6667,
+        recall: 0.3552,
+        f1: 0.4635,
+        ROC_AUC: 0.6992,
+        PR_AUC: 0.6239,
+        Best_Threshold:0.47,
+        MCC:0.2871,
       },
     ],
     radar: [
@@ -1210,7 +1788,7 @@ const datasetMeta = {
       { metric: "Precision", base: 81, stack: 87 },
       { metric: "Recall", base: 80, stack: 86 },
       { metric: "F1", base: 81, stack: 87 },
-      { metric: "Stability", base: 70, stack: 82 },
+      { metric: "MCC", base: 70, stack: 82 },
     ],
     confusion: [
       { actual: "Rock", predictedNegative: 22, predictedPositive: 5 },
@@ -1242,8 +1820,6 @@ const datasetMeta = {
       { fold: "Fold 5", base: 0.809, stack: 0.858 },
     ],
     note: "高維低樣本設定對泛化能力要求更高，很適合展示 stacking 在小型資料集下的價值。",
-    auc: 0.903,
-    ap: 0.861,
   },
 
   //Pumpkin Seeds Dataset
@@ -1255,122 +1831,186 @@ const datasetMeta = {
     size: "2,500",
     features: "12",
     classData: [
-      { name: "Çerçevelik", value: 1300, percentage: "52%" },
-      { name: "Ürgüp Sivrisi", value: 1200, percentage: "48%" },
+      { name: "Çerçevelik", value: 1300, percentage: "52%", color: "#93b5c6" },
+      { name: "Ürgüp Sivrisi", value: 1200, percentage: "48%", color: "#d7816a" },
     ],
     //實驗結果-基礎模型訓練表現(已改)
     models: [
       {
         name: "Logistic_regression",
         accuracy: 0.87,
-        precision: 0.908,
-        recall: 0.814,
-        f1: 0.858,
+        precision: 0.9078,
+        recall: 0.8140,
+        f1: 0.8584,
+        ROC_AUC: 0.9316,
+        PR_AUC: 0.9392,
+        Best_Threshold:0.36,
+        MCC:0.7427,
       },
       {
         name: "Decision_tree",
         accuracy: 0.866,
-        precision: 0.869,
-        recall: 0.851,
-        f1: 0.86,
+        precision: 0.8692,
+        recall: 0.8512,
+        f1: 0.8601,
+        ROC_AUC: 0.9160,
+        PR_AUC: 0.9139,
+        Best_Threshold:0.13,
+        MCC:0.7317,
       },
       {
         name: "Random_forest",
         accuracy: 0.888,
-        precision: 0.904,
-        recall: 0.86,
-        f1: 0.881,
+        precision: 0.9043,
+        recall: 0.8595,
+        f1: 0.8814,
+        ROC_AUC: 0.9316,
+        PR_AUC: 0.9355,
+        Best_Threshold:0.3,
+        MCC:0.7763,
       },
       {
         name: "SVM",
         accuracy: 0.434,
-        precision: 0.432,
-        recall: 0.537,
-        f1: 0.479,
+        precision: 0.4319,
+        recall: 0.5372,
+        f1: 0.4788,
+        ROC_AUC: 0.4358,
+        PR_AUC: 0.5949,
+        Best_Threshold:0.1,
+        MCC:-0.1282,
       },
       {
         name: "Xgboost",
         accuracy: 0.88,
-        precision: 0.892,
-        recall: 0.855,
-        f1: 0.873,
+        precision: 0.8922,
+        recall: 0.8554,
+        f1: 0.8734,
+        ROC_AUC: 0.9335,
+        PR_AUC: 0.9392,
+        Best_Threshold:0.65,
+        MCC:0.7601,
       },
       {
         name: "Lightgbm",
         accuracy: 0.876,
         precision: 0.875,
-        recall: 0.868,
-        f1: 0.871,
+        recall: 0.8678,
+        f1: 0.8714,
+        ROC_AUC: 0.9355,
+        PR_AUC: 0.9389,
+        Best_Threshold:0.45,
+        MCC:0.7517,
       },
       {
         name: "Catboost",
         accuracy: 0.882,
-        precision: 0.907,
-        recall: 0.843,
-        f1: 0.874,
+        precision: 0.9067,
+        recall: 0.8430,
+        f1: 0.8737,
+        ROC_AUC: 0.9363,
+        PR_AUC: 0.9427,
+        Best_Threshold:0.56,
+        MCC:0.7650,
       },
       {
         name: "MLP",
         accuracy: 0.8,
-        precision: 0.882,
-        recall: 0.678,
-        f1: 0.766,
+        precision: 0.8817,
+        recall: 0.6777,
+        f1: 0.7664,
+        ROC_AUC: 0.8219,
+        PR_AUC: 0.8617,
+        Best_Threshold:0.58,
+        MCC:0.6125,
       },
       {
         name: "KNN",
-        accuracy: 0.604,
-        precision: 0.716,
-        recall: 0.302,
+        accuracy: 0.7157,
+        precision: 0.3017,
+        recall: 0.4244,
         f1: 0.424,
+        ROC_AUC: 0.6623,
+        PR_AUC: 0.6770,
+        Best_Threshold:0.56,
+        MCC:0.2347,
       },
       {
         name: "Extra_trees",
         accuracy: 0.87,
-        precision: 0.858,
-        recall: 0.876,
-        f1: 0.867,
+        precision: 0.8583,
+        recall: 0.8760,
+        f1: 0.8671,
+        ROC_AUC: 0.9291,
+        PR_AUC: 0.9363,
+        Best_Threshold:0.2,
+        MCC:0.7400,
       },
       {
         name: "Gradient_boosting",
         accuracy: 0.878,
-        precision: 0.885,
-        recall: 0.86,
-        f1: 0.872,
+        precision: 0.8851,
+        recall: 0.8595,
+        f1: 0.8721,
+        ROC_AUC: 0.9335,
+        PR_AUC: 0.9383,
+        Best_Threshold:0.47,
+        MCC:0.7558,
       },
       {
         name: "Hist_gradient_boosting",
         accuracy: 0.874,
-        precision: 0.891,
-        recall: 0.843,
-        f1: 0.866,
+        precision: 0.8908,
+        recall: 0.8430,
+        f1: 0.8662,
+        ROC_AUC: 0.9345,
+        PR_AUC: 0.9356,
+        Best_Threshold:0.5,
+        MCC:0.7483,
       },
       {
         name: "Gaussian_nb",
         accuracy: 0.792,
-        precision: 0.797,
-        recall: 0.764,
-        f1: 0.781,
+        precision: 0.7974,
+        recall: 0.7645,
+        f1: 0.7806,
+        ROC_AUC: 0.8652,
+        PR_AUC: 0.8640,
+        Best_Threshold:0.31,
+        MCC:0.5835,
       },
       {
         name: "Bernoulli_nb",
         accuracy: 0.85,
-        precision: 0.861,
-        recall: 0.822,
-        f1: 0.841,
+        precision: 0.8615,
+        recall: 0.8223,
+        f1: 0.8414,
+        ROC_AUC: 0.8888,
+        PR_AUC: 0.8961,
+        Best_Threshold:0.2,
+        MCC:0.6999,
       },
       {
         name: "LDA",
         accuracy: 0.87,
-        precision: 0.886,
-        recall: 0.839,
-        f1: 0.862,
+        precision: 0.8865,
+        recall: 0.8388,
+        f1: 0.8620,
+        ROC_AUC: 0.9341,
+        PR_AUC: 0.9421,
+        Best_Threshold:0.54,
+        MCC:0.7403,
       },
       {
         name: "QDA",
         accuracy: 0.856,
-        precision: 0.894,
-        recall: 0.798,
-        f1: 0.843,
+        precision: 0.8935,
+        recall: 0.7975,
+        f1: 0.8428,
+        ROC_AUC: 0.9075,
+        PR_AUC: 0.9144,
+        Best_Threshold:0.98,
+        MCC:0.7147,
       },
     ],
     radar: [
@@ -1378,7 +2018,7 @@ const datasetMeta = {
       { metric: "Precision", base: 81, stack: 87 },
       { metric: "Recall", base: 80, stack: 86 },
       { metric: "F1", base: 81, stack: 87 },
-      { metric: "Stability", base: 70, stack: 82 },
+      { metric: "MCC", base: 70, stack: 82 },
     ],
     confusion: [
       { actual: "Rock", predictedNegative: 22, predictedPositive: 5 },
@@ -1410,64 +2050,157 @@ const datasetMeta = {
       { fold: "Fold 5", base: 0.809, stack: 0.858 },
     ],
     note: "高維低樣本設定對泛化能力要求更高，很適合展示 stacking 在小型資料集下的價值。",
-    auc: 0.903,
-    ap: 0.861,
   },
 };
 
-//資料集下方的欄位(目前想改成資料集介紹)
-const allDatasets = [
-  "Adult Income Dataset",
-  "Bank Marketing Dataset",
-  "Extrovert vs. Introvert Behavior Data",
-  "Banknote Authentication Dataset",
-  "German Credit Dataset",
-  "Breast Cancer Wisconsin Dataset",
-  "Ionosphere Dataset",
-  "Sonar Dataset",
+// 核心方法論 - 基礎模型池
+const baseModels = [
+  {
+    id:"lr",
+    name: "Logistic Regression",
+    short:"線性分類",
+    desc: "假設數據服從伯努利分佈，通過極大化似然函數的方法，運用梯度下降來求解參數，來達到將數據二分類的目的。",
+  },
+  {
+    id:"dt",
+    name: "Decision Tree",
+    short: "樹狀分類",
+    desc: "透過所有特徵與對應的值將資料切分，來找出最適合的分枝並繼續往下拓展，可解釋性高，但較容易產生過擬合。",
+  },
+  {
+    id:"rf",
+    name: "Random Forest",
+    short: "集成樹",
+    desc: "由多棵決策樹組成，使用 Bagging 加上隨機特徵採樣的方法所產生出來的整體學習演算法，讓結果較不容易過擬合，並使得預測能力更提升。"
+  },
+  {
+    id:"s",
+    name: "SVM",
+    short: "間隔分類",
+    desc: "透過找出一條分隔線使所有在邊界上的點離得越遠越好，使模型抵抗雜訊的能力更佳。",
+  },
+  {
+    id:"xg",
+    name: "XGBoost",
+    short: "梯度提升",
+    desc: "基於 Gradient Boosting 的強化模型，結合特徵隨機採樣、標準化與一、二階導數最佳化，具備高預測能力與良好泛化表現。",
+  },
+  {
+    id:"lgbm",
+    name: "LightGBM",
+    short: "高效提升",
+    desc: "以決策樹為基礎的高效梯度提升模型，具備訓練快速、低記憶體消耗與良好準確度，適合大規模資料分析。",
+  },
+  {
+    id:"cat",
+    name: "CatBoost",
+    short: "類別增強",
+    desc: "基於 Gradient Boosting Tree 的梯度提升樹模型框架，能自動處理類別特徵與缺失值，並支援多種資料型態與 CPU/GPU 運算，兼具高效能與良好泛化能力。",
+  },
+  {
+    id:"m",
+    name: "MLP",
+    short: "神經網路",
+    desc: "多層感知器透過前向與反向傳播學習非線性高維資料，適合複雜分類模式辨識。",
+  },
+  {
+    id:"k",
+    name: "KNN",
+    short: "鄰近分類",
+    desc: "採多數決標準，依據樣本鄰近距離進行分類，概念直觀，但對資料尺度較敏感。",
+  },
+  {
+    id:"et",
+    name: "Extra Trees",
+    short: "集成樹",
+    desc: "與隨機森林類似，但隨機選擇切割點，可提升訓練速度、穩定性與泛化能力。",
+  },
+  {
+    id:"gb",
+    name: "Gradient Boosting",
+    short: "逐步提升",
+    desc: "透過迭代方式逐步修正前一模型的預測誤差，進而建立具良好預測能力的強分類器",
+  },
+  {
+    id:"hgb",
+    name: "HistGradientBoosting",
+    short: "直方提升",
+    desc: "基於梯度提升決策樹，透過直方圖分箱加速訓練，能高效處理大規模與高維稀疏資料。",
+  },
+  {
+    id:"gnb",
+    name: "Gaussian NB",
+    short: "機率分類",
+    desc: "假設特徵相互獨立且服從高斯分布，具訓練快速、簡單高效與適合作為基準模型的特性。",
+  },
+  {
+    id:"bnb",
+    name: "Bernoulli NB",
+    short: "二元機率",
+    desc: "假設特徵相互獨立且服從伯努利分布，具簡單高效且適合二元特徵分類的特性。",
+  },
+  {
+    id:"l",
+    name: "LDA",
+    short: "線性判別",
+    desc: "透過線性投影最大化類別間差異並最小化類別內差異，兼具降維與分類能力。",
+  },
+  {
+    id:"q",
+    name: "QDA",
+    short: "二次判別",
+    desc: "為 LDA 的延伸，透過各類別獨立協方差矩陣建立非線性決策邊界，適合較複雜分布資料。",
+  },
 ];
 
-//核心方法論-基礎模型池
-const baseModels = [
-  "Logistic Regression",
-  "Decision Tree",
-  "Random Forest",
-  "SVM",
-  "XGBoost",
-  "LightGBM",
-  "CatBoost",
-  "MLP",
-  "KNN",
-  "Extra Trees",
-  "Gradient Boosting",
-  "HistGradientBoosting",
-  "Gaussian NB",
-  "Bernoulli NB",
-  "LDA",
-  "QDA",
-];
+//將每個基礎模型加上各自type
+const baseModelsWithType = baseModels.map(model => {
+  if (["lr"].includes(model.id)) return { ...model, type: "線性模型" };
+  if (["dt", "rf", "et"].includes(model.id)) return { ...model, type: "樹狀與集成模型" };
+  if (["xg", "lgbm", "cat", "gb", "hgb"].includes(model.id)) return { ...model, type: "Boosting 模型" };
+  if (["k"].includes(model.id)) return { ...model, type: "距離與鄰近模型" };
+  if (["s", "m"].includes(model.id)) return { ...model, type: "核方法與神經網路" };
+  if (["gnb", "bnb"].includes(model.id)) return { ...model, type: "機率式分類模型" };
+  if (["l","q"].includes(model.id)) return { ...model, type: "判別分析模型" };
+  return model;
+});
+
+// 依 type 分組
+const groupedModels = baseModelsWithType.reduce((acc, model) => {
+  if (!acc[model.type]) acc[model.type] = [];
+  acc[model.type].push(model);
+  return acc;
+}, {});
 
 //核心方法論-所有方法(Stacking)概述
 const stackingMethods = [
   {
     title: "Logistic Regression Stacking",
-    desc: "將各基礎模型的預測機率組成次層特徵矩陣，再用 LR 學習整合權重。",
+    desc: "將基礎模型的機率當作特徵，再訓練 LR 學習整合權重。",
   },
   {
     title: "XGBoost Stacking",
-    desc: "利用 boosting 建模非線性組合關係，適合處理複雜模型互補性。",
+    desc: "利用 Boosting 學習更複雜的模型組合方式，提高堆疊效能。",
   },
   {
     title: "CatBoost Stacking",
-    desc: "透過 ordered boosting 降低過度擬合風險，對中小型資料表現穩定。",
+    desc: "透過 Ordered Boosting 降低過度擬合風險，特別適合中小型資料集的堆疊。",
   },
   {
-    title: "Voting / Odds / Inverse Variance",
-    desc: "從機率層級直接整合，兼具可解釋性與實作彈性。",
+    title: "投票法 Voting",
+    desc: "平均加權方法屬於 Soft Voting，其作法為對所有基礎模型輸出的預測機率給予相同權重，取其平均作為最終預測結果。",
+  },
+  {
+    title: "勝算加權 Odds Weighting",
+    desc: "以模型表現（F1）轉換成勝算作為權重，讓強模型的影響力更大。",
+  },
+  {
+    title: "逆變異加權 Inverse Variance Weighting",
+    desc: "將變異數作為權重，提升堆疊的效能。",
   },
 ];
 
-//數據與流程-訓練流程圖
+//數據與流程-整體流程
 const processSteps = [
   {
     id: "dataset",
@@ -1533,10 +2266,6 @@ const processSteps = [
       "欄位名稱與格式轉換",
       "目標變數 0/1 編碼",
       "類別變數獨熱編碼",
-      "數值變數標準化",
-      "偏態檢定與 Box-Cox / Yeo-Johnson",
-      "部分資料集進行 PCA 降維",
-      "切割訓練集與測試集(8：2)",
     ],
   },
   {
@@ -1547,6 +2276,8 @@ const processSteps = [
     panelTitle: "模型訓練與評估程序",
     panelDesc:
       "以一致流程訓練具多元特性的基礎分類模型，觀察其在不同資料集上的表現差異與穩定性，作為後續整合依據。",
+    panelText:
+      "我們藉由以下16種不同的基礎模型進行訓練，目的是優化堆疊模型之強健性並降低預測偏誤。",
     modelGroups: [
       {
         category: "線性模型",
@@ -1588,21 +2319,31 @@ const processSteps = [
     id: "filtering",
     short: "篩選",
     title: "模型排序與篩選策略",
-    desc: "依 F1 或 Accuracy 排序，排除陡降區段模型，降低弱模型干擾。",
+    desc: "將弱模型篩選並排除，以降低其對堆疊模型整體表現的干擾。",
     panelTitle: "模型排序與篩選程序",
     panelDesc:
-      "透過模型排序曲線辨識效能陡降區段，刪除表現明顯落後的弱模型，保留較具穩定性與代表性的候選模型。",
-    image: "/陡坡圖.png",
-    imageAlt: "模型排序與陡降區段示意圖",
+      "透過排序剔除弱模型，並結合多指標篩選代表性模型，以提升堆疊模型的穩定性與整體效能。",
+    methods: [
+    {
+      title: "方法一：F1 排序篩選法",
+      desc: "依基礎模型結果中的 F1 分數由高至低排序，透過陡坡圖辨識陡降區段，排除表現明顯下降之模型，以降低弱模型對堆疊結果的干擾。",
+    },
+    {
+      title: "方法二：四值取法",
+      desc: "分別選取在 Precision、Recall、PR-AUC 與 ROC-AUC 指標下表現最佳之模型納入堆疊，以保留不同評估面向下具代表性的模型，提升整體預測能力。",
+    },
+  ],
   },
   {
     id: "integration",
     short: "整合",
     title: "Stacking 與加權融合",
-    desc: "將基礎模型輸出作為 meta 特徵或機率加權來源，建立最終整合模型。",
+    desc: "將篩選出來的基礎模型輸出作為 meta 特徵或機率加權來源，建立最終整合模型。",
     panelTitle: "模型整合程序",
     panelDesc: "透過多模型融合提升最終分類表現",
-    methods: [
+    panelText:
+      "我們採用以下六種方法進行模型堆疊，以降低模型波動並提升整體分類表現，並期望所提出的勝算堆疊方法能展現更佳效能。",
+    stackingMethods: [
       "Logistic Regression Stacking",
       "XGBoost Stacking",
       "CatBoost Stacking",
@@ -1615,12 +2356,13 @@ const processSteps = [
     id: "analysis",
     short: "分析",
     title: "結果詮釋與比較分析",
-    desc: "從單一模型、整合模型與跨資料集層面觀察研究發現與應用價值。",
+    desc: "從單一模型、堆疊整合模型與跨資料集層面觀察研究發現與應用價值。",
     panelTitle: "結果分析與研究詮釋",
     panelDesc: "從模型表現與跨資料集差異整理研究發現",
   },
 ];
 
+//數據與流程-基礎模型訓練流程
 const baseTrainingSteps = [
   {
     id: "base-split",
@@ -1630,10 +2372,9 @@ const baseTrainingSteps = [
     panelTitle: "基礎模型訓練：資料切分與前處理",
     panelDesc: "先建立一致的輸入條件，再進行模型訓練。",
     panelItems: [
-      "切割訓練集與測試集（8:2）",
+      "切割訓練集與測試集（8:2），再將訓練集切成訓練集與驗證集(8:2)",
       "數值欄位標準化與分布修正",
       "類別欄位編碼與格式轉換",
-      "必要時進行 PCA 或特徵轉換",
     ],
   },
   {
@@ -1684,6 +2425,7 @@ const baseTrainingSteps = [
   },
 ];
 
+//數據與流程-堆疊流程
 const stackingFlowSteps = [
   {
     id: "stack-select",
@@ -1837,7 +2579,7 @@ function NavBar({ currentPage, setCurrentPage }) {
               <Layers3 className="h-5 w-5" />
             </div>
             <div>
-              <div className="font-semibold text-slate-1500">
+              <div className="font-semibold text-slate-900 md:text-2xl">
                 兩分類資料堆疊整合學習器
               </div>
             </div>
@@ -1886,27 +2628,13 @@ function HomePage({ setCurrentPage }) {
               <span className="block text-[#d7816a]">
                 Two-Classification Data Stack Integrated Learner
               </span>
-            </h1>
-            <p className="max-w-2xl text-lg leading-8 text-slate-600 md:text-2xl">
+            </h1>           
+            <p className="max-w-2xl text-lg leading-8 text-slate-600 md:text-3xl">
               指導教授:李名鏞
             </p>
-            <p className="md:text-1xl">
+            <p className="max-w-2xl text-lg leading-8 text-slate-600 md:text-1xl">
               專題組員:許博翔、顏畯榤、張妍婷、柯廷翰、陳宗揚、葉芷儀、韋葶妤、倪佩榆
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Button
-                className="rounded-2xl bg-[#93b5c6] text-white hover:bg-[#7fa7b8]"
-                onClick={() => setCurrentPage("method")}
-              >
-                查看核心方法 <ChevronRight className="ml-1 h-4 w-4" />
-              </Button>
-              <Button
-                className="rounded-2xl bg-[#93b5c6] text-white hover:bg-[#7fa7b8]"
-                onClick={() => setCurrentPage("research")}
-              >
-                前往研究流程
-              </Button>
-            </div>
+            </p>          
             <div className="grid gap-4 pt-4 sm:grid-cols-3">
               {[
                 { label: "驗證資料集", value: "8" },
@@ -1939,7 +2667,7 @@ function HomePage({ setCurrentPage }) {
             <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg text-slate-800">
-                  <Microscope className="h-5 w-5 text-[#F0CF65]" /> 摘要
+                  <Microscope className="h-5 w-5 text-[#93b5c6]" /> 摘要
                 </CardTitle>
                 <CardDescription className="text-slate-600">
                   研究核心概念與整體方向
@@ -1947,11 +2675,11 @@ function HomePage({ setCurrentPage }) {
               </CardHeader>
               <CardContent className="space-y-4 text-sm leading-7 text-slate-600">
                 <p>
-                  本研究比較多種二元分類基礎模型，並透過不同的堆疊加權方法
-                  、勝算加權以及逆變異數加權整合方式，檢驗是否能在多資料集任務中提升分類準確度、穩定性與泛化能力。
+                  本研究比較多種二元分類基礎模型，並透過不同的 stacking
+                  與機率加權整合方式，檢驗是否能在多資料集任務中提升分類準確度、穩定性與泛化能力。
                 </p>
                 <p>
-                  研究流程涵蓋資料前處理、模型訓練、模型篩選、次層整合與結果解釋。
+                  研究流程涵蓋資料前處理、模型訓練、模型篩選、次層整合與結果解釋，並藉由互動式網站將方法與結果以更具可讀性的形式呈現。
                 </p>
               </CardContent>
             </Card>
@@ -2014,8 +2742,8 @@ function FlowDiagram({ steps, activeStep, onStepClick }) {
           <div
             className={`absolute left-5 top-5 flex h-9 w-9 items-center justify-center rounded-2xl text-sm font-semibold transition-colors ${
               activeStep === step.id
-                ? "bg-[#93b5c6] text-white"
-                : "bg-[#efe8dc] text-slate-500"
+                ? "bg-[#93b5c6] text-white" //被選中
+                : "bg-[#efe8dc] text-slate-500" //未選中
             }`}
           >
             {idx + 1}
@@ -2035,10 +2763,10 @@ function FlowDiagram({ steps, activeStep, onStepClick }) {
 
             {/* 右側箭頭指示器 */}
             <div
-              className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${
+              className={`flex h-10 shrink-0  aspect-square items-center justify-center rounded-full transition-all ${
                 activeStep === step.id
                   ? "bg-[#93b5c6] text-white"
-                  : "bg-slate-100 text-slate-300 group-hover:text-[#d7816a]"
+                  : "bg-[#efe8dc] text-slate-500"
               }`}
             >
               <ArrowRight
@@ -2153,6 +2881,12 @@ function DataPage() {
                           ))}
                         </div>
                       )}
+                      {step.panelText &&
+                        !["模型排序與篩選策略", "結果分析與研究詮釋"].includes(step.panelTitle) && (
+                          <p className="text-sm leading-relaxed text-slate-600 bg-[#ddedaa]/35 p-4 rounded-2xl border border-[#93b5c6]/12">
+                            {step.panelText}
+                          </p>
+                      )}
 
                       {step.modelGroups && (
                         <div className="grid gap-4 sm:grid-cols-2">
@@ -2178,23 +2912,40 @@ function DataPage() {
                           ))}
                         </div>
                       )}
+                      {step.stackingMethods && (
+                        <div className="space-y-3">
+                          <h3 className="text-base font-semibold text-slate-900">
+                            Stacking 方法
+                          </h3>
 
-                      {step.image && (
-                        <div className="rounded-2xl overflow-hidden border border-slate-200">
-                          <img
-                            src={step.image}
-                            alt={step.imageAlt}
-                            className="w-full h-auto object-cover"
-                          />
+                          <div className="flex flex-wrap gap-2">
+                            {step.stackingMethods.map((method, idx) => (
+                              <span
+                                key={idx}
+                                className="px-3 py-1 rounded-md bg-[#f7f3ec]  text-slate-700 text-sm border border-[#93b5c6]/20"
+                              >
+                                {method}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       )}
-
-                      {step.panelText && (
-                        <p className="text-sm leading-relaxed text-slate-600 bg-[#ddedaa]/35 p-4 rounded-2xl border border-[#93b5c6]/12">
-                          {step.panelText}
-                        </p>
-                      )}
-
+                      {step.methods && (
+                        <div className="space-y-8">
+                          {step.methods.map((method, idx) => (
+                            <div key={idx} className="space-y-4">
+                              {/* 方法標題 */}
+                              <h3 className="text-base font-semibold text-slate-900">
+                                {method.title}
+                              </h3>
+                              {/* 方法說明 */}
+                              <p className="text-sm text-slate-600 leading-relaxed">
+                                {method.desc}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )}                      
                       {step.links && (
                         <div className="grid gap-3">
                           {step.links.map((item) => (
@@ -2218,12 +2969,13 @@ function DataPage() {
                           ))}
                         </div>
                       )}
-
+                      
                       {!step.panelItems &&
                         !step.modelGroups &&
                         !step.image &&
                         !step.panelText &&
-                        !step.links && (
+                        !step.links && 
+                        !["模型排序與篩選程序", "結果分析與研究詮釋"].includes(step.panelTitle) && (
                           <div className="rounded-2xl bg-[#f5efe4] p-4 text-sm leading-7 text-slate-600">
                             {step.desc}
                           </div>
@@ -2239,8 +2991,7 @@ function DataPage() {
   );
 }
 
-//研究流程頁面
-//實驗結果頁面
+//核心方法論頁面
 function MethodPage() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -2249,10 +3000,78 @@ function MethodPage() {
         title="Stacking 概述、LaTeX 公式與元學習器策略"
         description="這個區塊以論文展示頁的方式呈現方法：先說明概念，再用 LaTeX 公式表達，最後補上模型選擇邏輯。"
       />
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+          <CardHeader><CardTitle>基礎模型池</CardTitle><CardDescription>納入多樣化基礎分類器，提升堆疊整合時的模型異質性與泛化能力</CardDescription></CardHeader>
+          <CardContent className="space-y-10 max-h-[360px] overflow-y-auto pr-2">
+            {Object.entries(groupedModels).map(([type, models]) => (
+              <section key={type}>
+                {/* 區塊標題 */}
+                <h3 className="text-lg font-bold text-slate-800 mb-4">{type}</h3>
+                {/* 模型列表 */}
+                <div className="space-y-6">
+                  {models.map((m) => (
+                    <div
+                      key={m.id}
+                      className="rounded-[22px] border border-slate-200 bg-white/90 p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h4 className="text-base font-semibold text-slate-800">{m.name}</h4>
+                          <p className="mt-1 text-xs font-medium tracking-wide text-slate-500"></p>
+                        </div>
+                        <span className="shrink-0 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">{m.short}</span>
+                      </div>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">{m.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </CardContent>
+        </Card>
+        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle>模型篩選策略</CardTitle>
+            <CardDescription>本研究透過兩種模型篩選方法，挑選表現較佳之基礎模型，並將其納入後續堆疊模型建構。</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6 text-sm leading-6 text-slate-600 max-h-[360px] overflow-y-auto pr-2">
+            <div className="space-y-3">
+              <h3 className="text-base font-semibold text-slate-800">
+                方法一：F1 排序篩選法
+              </h3>
+              <p>
+                依據基礎模型的 F1 進行由高到低排序，並觀察分數下降幅度。
+                當下降幅度出現明顯轉折時，將該區段之後的模型排除，不納入堆疊學習。
+              </p>
+              <img
+                src="/陡坡圖.png"
+                alt="F1篩選法示意圖"
+                className="rounded-xl border border-slate-200 shadow-sm"
+              />
+              <div className="space-y-3">
+                <h3 className="text-base font-semibold text-slate-800">
+                  方法二：四值取法
+                </h3>
+                <p>
+                  分別選取基礎模型中四項指標表現最佳者：
+                  Precision、Recall、PR-AUC 及 ROC-AUC，
+                  作為堆疊模型的輸入基礎模型集合。
+                </p>
+                <img
+                  src="/4rank.png"
+                  alt="四值篩選法示意圖"
+                  className="rounded-xl border border-slate-200 shadow-sm"
+                />
+              </div>
+            </div>     
+          </CardContent>
+        </Card>
+      </div>
       <div className="mt-10 grid gap-6 lg:grid-cols-2">
         <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
           <CardHeader><CardTitle className="text-xl">所有方法（Stacking）概述</CardTitle></CardHeader>
-          <CardContent className="grid gap-3">
+          <CardContent className="grid gap-3 max-h-[360px] overflow-y-auto pr-2">
             {stackingMethods.map((m) => (
               <div key={m.title} className="rounded-2xl border border-slate-200 bg-white/90 p-4">
                 <div className="font-medium text-slate-900">{m.title}</div>
@@ -2277,33 +3096,148 @@ function MethodPage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <FormulaCard title="平均加權" formula={"E(x)=\\sum_{i=1}^{k} w_i\\,p_i(x),\\qquad \\sum_i w_i=1"} description="將各模型預測機率依權重加總，形成最終整合分數。" />
         <FormulaCard title="勝算加權 Odds Weighting" formula={"\\mathrm{odds}_i=\\frac{p_i}{1-p_i},\\qquad w_i=\\frac{\\mathrm{odds}_i}{\\sum_j \\mathrm{odds}_j}"} description="先將機率轉為勝算，再依相對強度配置整合權重。" />
-        <FormulaCard title="Inverse Variance Weighting" formula={"w_i=\\frac{1/\\sigma_i^2}{\\sum_j 1/\\sigma_j^2}"} description="對波動較大的模型給予較低權重，提升整合結果穩定性。" />
-        <FormulaCard title="模型篩選觀點" formula={"\\mathcal{M}^*=\\{m_i\\mid \\Delta \\mathrm{score}_i \\text{ not in steep-drop zone}\\}"} description="依表現陡降區間篩除弱模型，避免整合時引入過多噪音。" />
-      </div>
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
-        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
-          <CardHeader><CardTitle>元學習器選擇策略</CardTitle></CardHeader>
-          <CardContent className="space-y-4 text-sm leading-7 text-slate-600">
-            <p>先依基礎模型的 F1 分數或準確率排序，再觀察分數下降斜率，將陡降區段中的低品質模型排除後再進入 stacking。</p>
-            <p>這種策略可降低弱模型對整合結果的干擾，讓 meta learner 更聚焦於高品質模型輸出的互補資訊。</p>
-          </CardContent>
-        </Card>
-        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
-          <CardHeader><CardTitle>基礎模型池</CardTitle><CardDescription>以 badge 呈現模型庫，提升資訊密度與視覺辨識度</CardDescription></CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
-            {baseModels.map((m) => (<Badge key={m} variant="secondary" className="rounded-full px-3 py-1 text-slate-700">{m}</Badge>))}
-          </CardContent>
-        </Card>
-      </div>
+        <FormulaCard title="Inverse Variance Weighting" formula={"w_i=\\frac{1/\\sigma_i^2}{\\sum_j 1/\\sigma_j^2}"} description="對波動較大的模型給予較低權重，提升整合結果穩定性。" />       
+      </div>      
     </section>
   );
 }
 
+const stackingModels = [
+  { id: "stack_odds", name: " Odds Weighting Stacking" },
+  { id: "stack_avg", name: "Average Stacking" },
+  { id: "stack_inv_var", name: "Inverse Variance Weighting Stacking" },
+  { id: "stack_logistic", name: "Logistic Regression Stacking" },
+  { id: "stack_catboost", name: "CatBoost Stacking" },
+  { id: "stack_xgboost", name: "XGBoost Stacking" },
+];
+
+
+function ConfusionMatrixCard({ title, result, rows }) {
+  if (!result) {
+    return (
+      <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+        <CardContent className="p-8">
+          <div className="rounded-2xl border border-dashed border-slate-300 p-6 text-slate-500">
+            找不到對應的混淆矩陣資料
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const cells = [
+    { label: "TN", value: result.TN, highlight: true },
+    { label: "FP", value: result.FP, highlight: false },
+    { label: "FN", value: result.FN, highlight: false },
+    { label: "TP", value: result.TP, highlight: true },
+  ];
+
+  return (
+    <Card className="rounded-[32px] border border-white/70 bg-white/85 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+      <CardContent className="p-8">
+        <div className="flex items-start gap-3">
+          <div>
+            <h3 className="text-[32px] font-bold tracking-tight text-slate-900">
+              混淆矩陣比較
+            </h3>
+            <p className="mt-2 text-sm text-slate-500">
+              {title} ｜ {result.Model} ｜ {result.Strategy}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-8 grid grid-cols-2 gap-4">
+          {cells.map((cell) => (
+            <div
+              key={cell.label}
+              className={`rounded-[26px] px-6 py-7 ${
+                cell.highlight
+                  ? "bg-[#9bb6c7] text-white"
+                  : "bg-[#e9edf2] text-slate-900"
+              }`}
+            >
+              <div
+                className={`text-[16px] ${
+                  cell.highlight ? "text-white/85" : "text-slate-600"
+                }`}
+              >
+                {cell.label}
+              </div>
+              <div className="mt-3 text-[48px] font-bold leading-none tracking-tight tabular-nums">
+                {cell.value}
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+//研究流程頁面
 function ResearchPage() {
   const [datasetKey, setDatasetKey] = useState("personality");
-  const current = datasetMeta[datasetKey];
-  const lineData = useMemo(() => current.models, [current]);
+  const [modelType, setModelType] = useState("base");
+  const [metric, setMetric] = useState("f1rank7");
+  const [selectedModel, setSelectedModel] = useState(null);
 
+  const current = datasetMeta?.[datasetKey] || {};
+  
+  const datasetNameMap = {
+  personality: "behavior",
+  german: "german",
+  sonar: "sonar",
+  cancer: "cancer",
+  I: "ionosphere",
+  Income: "adult",
+  water: "water",
+  pumpkin: "pumpkin",
+  };
+
+  const jsonDatasetName = datasetNameMap[datasetKey];
+
+  const datasetResults = useMemo(() => {
+   return allStackingResults.filter((row) => row.Dataset === jsonDatasetName);
+  }, [jsonDatasetName]);
+
+  const bestBaseResult = useMemo(() => {
+    return datasetResults
+      .filter((row) => row.Type === "base")
+      .sort((a, b) => (b.F1 - a.F1) || (b.MCC - a.MCC))[0] || null;
+  }, [datasetResults]);
+
+  const bestStackResult = useMemo(() => {
+    return datasetResults
+      .filter((row) => row.Type === "stack")
+      .sort((a, b) => (b.F1 - a.F1) || (b.MCC - a.MCC))[0] || null;
+  }, [datasetResults]);
+
+  const toConfusionRows = (result) => {
+    if (!result) return [];
+    return [
+      {
+        actual: "Negative",
+        predictedNegative: result.TN,
+        predictedPositive: result.FP,
+      },
+      {
+        actual: "Positive",
+        predictedNegative: result.FN,
+        predictedPositive: result.TP,
+      },
+    ];
+  };
+
+  const bestBaseConfusionRows = useMemo(
+    () => toConfusionRows(bestBaseResult),
+    [bestBaseResult]
+  );
+
+  const bestStackConfusionRows = useMemo(
+    () => toConfusionRows(bestStackResult),
+    [bestStackResult]
+  );
+  
   const { bestModel, worstModel } = useMemo(() => {
     if (!current?.models?.length) return { bestModel: null, worstModel: null };
     let best = current.models[0];
@@ -2315,12 +3249,52 @@ function ResearchPage() {
     return { bestModel: best, worstModel: worst };
   }, [current.models]);
 
-  const confusionCells = [
-    { label: "TN", value: current.confusion[0].predictedNegative },
-    { label: "FP", value: current.confusion[0].predictedPositive },
-    { label: "FN", value: current.confusion[1].predictedNegative },
-    { label: "TP", value: current.confusion[1].predictedPositive },
-  ];
+  
+  
+  const metrics = Object.keys(
+    current.confusionMatrix?.[modelType] || {}
+  );
+
+  // model list
+  const modelOptions = Object.keys(
+    current?.confusionMatrix?.[modelType]?.[metric] || {}
+  );
+
+  // auto select first model
+  useEffect(() => {
+    if (modelOptions.length > 0) {
+      setSelectedModel(modelOptions[0]);
+    }else {
+      setSelectedModel(null);
+    }
+  }, [modelOptions]);
+
+  const cm = current.confusionMatrix?.[modelType]?.[metric]?.[selectedModel]?.cm;
+
+  const confusionCells = useMemo(() => {
+    if (!cm) return [];
+
+    const [[TN, FP], [FN, TP]] = cm;
+
+    return [
+      { label: "TN", value: TN },
+      { label: "FP", value: FP },
+      { label: "FN", value: FN },
+      { label: "TP", value: TP },
+    ];
+  }, [cm]);
+
+  const lineData = useMemo(() => {
+  return [...current.models].sort((a, b) => b.f1 - a.f1);
+  }, [datasetKey]);
+  const lineData2 = useMemo(() => {
+  return [...current.models].sort((a, b) => b.precision - a.precision);
+  }, [datasetKey]);
+
+  console.log("modelOptions =", modelOptions);
+  console.log("metric =", metric);
+  console.log("modelType =", modelType);
+  console.log("current =", current);
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -2338,17 +3312,14 @@ function ResearchPage() {
       </div>
 
       <div className="mt-10 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
-          <CardHeader>
+        <Card className="rounded-[24px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+          <CardHeader className="px-6 pt-6 pb-3">
             <CardTitle className="flex items-center gap-2 text-xl">
               <Database className="h-5 w-5 text-[#93b5c6]" />
               資料集介紹
             </CardTitle>
-            <CardDescription>
-              研究流程頁最上方先說明目前資料集背景與分布
-            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="px-6 pb-6 pt-0">
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
               <div className="text-sm text-[#93b5c6] font-medium">
                 目前資料集
@@ -2375,24 +3346,10 @@ function ResearchPage() {
                 {current.note}
               </p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-slate-200 p-4">
-                <div className="text-slate-500 text-sm">ROC AUC</div>
-                <div className="mt-1 text-2xl font-semibold text-slate-900">
-                  {current.auc.toFixed(3)}
-                </div>
-              </div>
-              <div className="rounded-2xl border border-slate-200 p-4">
-                <div className="text-slate-500 text-sm">PR AUC / AP</div>
-                <div className="mt-1 text-2xl font-semibold text-slate-900">
-                  {current.ap.toFixed(3)}
-                </div>
-              </div>
-            </div>
           </CardContent>
         </Card>
 
-        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+        <Card className="rounded-[24px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
           <CardHeader>
             <CardTitle>目標變數分布</CardTitle>
             <CardDescription>隨資料集切換同步更新</CardDescription>
@@ -2414,7 +3371,38 @@ function ResearchPage() {
                     <Cell fill="#93b5c6" />
                     <Cell fill="#d7816a" />
                   </Pie>
-                  <Tooltip />
+                  <Tooltip
+                    content={({ active, payload }) => {
+                      if (!active || !payload || !payload.length || !payload[0]?.payload) {
+                        return null;
+                      }
+
+                      const data = payload[0].payload;
+
+                      return (
+                        <div
+                          style={{
+                            backgroundColor: "#fff",
+                            border: "1px solid #ddd",
+                            padding: "12px 16px",
+                            borderRadius: "10px",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                          }}
+                        > 
+                          <p
+                            style={{
+                              margin: 0,
+                              color: data.color,
+                              fontSize: "14px",
+                              fontWeight: "500",//字體的粗度(越往上越粗)
+                            }}
+                          >
+                            {data.name}{"： "}{data.value}{" ("}{data.percentage}{")"}
+                          </p>
+                        </div>
+                      );
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -2458,20 +3446,28 @@ function ResearchPage() {
                     <th className="px-4 py-3 font-medium">Precision</th>
                     <th className="px-4 py-3 font-medium">Recall</th>
                     <th className="px-4 py-3 font-medium">F1</th>
+                    <th className="px-4 py-3 font-medium">ROC_AUC</th>
+                    <th className="px-4 py-3 font-medium">PR_AUC</th>
+                    <th className="px-5 py-3 font-medium">MCC</th>
+                    <th className="px-4 py-3 font-medium">Best_Threshold</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 bg-white text-slate-600">
                   {current.models.map((row) => (
-                    <tr key={row.name}>
+                    <tr key={row.name}> 
                       <td className="px-4 py-3 font-medium text-slate-900">
                         {row.name}
                       </td>
-                      <td className="px-4 py-3">{row.accuracy.toFixed(3)}</td>
-                      <td className="px-4 py-3">{row.precision.toFixed(3)}</td>
-                      <td className="px-4 py-3">{row.recall.toFixed(3)}</td>
+                      <td className="px-5 py-3">{row.accuracy.toFixed(4)}</td>
+                      <td className="px-5 py-3">{row.precision.toFixed(4)}</td>
+                      <td className="px-5 py-3">{row.recall.toFixed(4)}</td>
                       <td className="px-4 py-3 font-semibold text-[#d7816a]">
-                        {row.f1.toFixed(3)}
+                        {row.f1.toFixed(4)}
                       </td>
+                      <td className="px-5 py-3">{row.ROC_AUC.toFixed(4)}</td>
+                      <td className="px-5 py-3">{row.PR_AUC.toFixed(4)}</td>
+                      <td className="px-6 py-3">{row.MCC.toFixed(4)}</td>
+                      <td className="px-6 py-3">{row.Best_Threshold.toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -2492,19 +3488,32 @@ function ResearchPage() {
                 <div className="mt-1 text-xl font-bold text-slate-900">
                   {bestModel?.name}
                 </div>
-                <div className="text-[#d7816a]">
-                  F1 = {bestModel?.f1.toFixed(3)}
+                {/*"F1的顏色：text-[#d7816a]"*/ }
+                <div className="text-slate-600">
+                  F1 = {bestModel?.f1.toFixed(4)}
+                </div>
+                <div className="text-slate-600">
+                  ROC AUC = {bestModel?.ROC_AUC?.toFixed(4)}
+                </div>
+                <div className="text-slate-600">
+                  PR AUC = {bestModel?.PR_AUC?.toFixed(4)}
                 </div>
               </div>
               <div className="rounded-2xl bg-[#f5efe4] p-4 shadow-sm">
-                <div className="text-slate-500">最低表現</div>
+                <div className="text-slate-500">最差表現</div>
                 <div className="mt-1 text-xl font-bold text-slate-900">
                   {worstModel?.name}
                 </div>
-                <div className="text-rose-600">
-                  F1 = {worstModel?.f1.toFixed(3)}
+                <div className="text-slate-600">
+                  F1 = {worstModel?.f1.toFixed(4)}
                 </div>
+                <div className="text-slate-600">
+                  ROC AUC = {worstModel?.ROC_AUC?.toFixed(4)}
+                </div>
+                <div className="text-slate-600">
+                  PR AUC = {worstModel?.PR_AUC?.toFixed(4)}
               </div>
+            </div>
             </div>
             <div className="rounded-2xl border border-slate-200 p-4 leading-7">
               基礎模型結果會隨資料集切換同步更新，可直接拿來對照下方堆疊模型分析是否真的帶來穩定提升。
@@ -2513,6 +3522,7 @@ function ResearchPage() {
         </Card>
       </div>
 
+      {/*模型 F1 比較圖*/}
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
           <CardHeader>
@@ -2547,11 +3557,13 @@ function ResearchPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/*Precision / Recall 對比圖*/ }
         <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Accuracy / Recall 對比圖</CardTitle>
+            <CardTitle>Precision / Recall 對比圖</CardTitle>
             <CardDescription>
-              觀察不同模型在準確率與召回率上的取捨
+              觀察不同模型在預測率與召回率上的取捨
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -2559,7 +3571,7 @@ function ResearchPage() {
               <div className="min-w-[1200px] px-6">
                 <ResponsiveContainer width="100%" height={320}>
                   <BarChart
-                    data={lineData}
+                    data={lineData2}
                     margin={{ top: 20, right: 30, left: 0, bottom: 20 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
@@ -2574,7 +3586,7 @@ function ResearchPage() {
                     <Tooltip />
                     <Legend />
                     <Bar
-                      dataKey="accuracy"
+                      dataKey="precision"
                       fill="#93b5c6"
                       radius={[8, 8, 0, 0]}
                     />
@@ -2598,93 +3610,48 @@ function ResearchPage() {
           description="以下內容整合原本進階分析頁的圖表，並與上方基礎模型結果放在同一個資料集上下文中。"
         />
       </div>
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-xl">
-              <Binary className="h-5 w-5 text-[#93b5c6]" />
-              混淆矩陣
-            </CardTitle>
-            <CardDescription>
-              用四格卡片快速判讀 TP / TN / FP / FN
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              {confusionCells.map((cell, idx) => (
-                <div
-                  key={cell.label}
-                  className={`rounded-3xl p-6 ${idx === 0 || idx === 3 ? "bg-[#93b5c6] text-white" : "bg-slate-100 text-slate-900"}`}
-                >
-                  <div className="text-sm opacity-80">{cell.label}</div>
-                  <div className="mt-2 text-3xl font-bold">{cell.value}</div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200">
-              <table className="min-w-full text-sm">
-                <thead className="bg-slate-50 text-slate-600">
-                  <tr>
-                    <th className="px-4 py-3 text-left">Actual</th>
-                    <th className="px-4 py-3 text-left">Predicted Negative</th>
-                    <th className="px-4 py-3 text-left">Predicted Positive</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white text-slate-700">
-                  {current.confusion.map((row) => (
-                    <tr key={row.actual} className="border-t border-slate-200">
-                      <td className="px-4 py-3 font-medium">{row.actual}</td>
-                      <td className="px-4 py-3">{row.predictedNegative}</td>
-                      <td className="px-4 py-3">{row.predictedPositive}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-xl">
-              <FlaskConical className="h-5 w-5 text-[#93b5c6]" />
-              單一模型 vs Stacking 雷達圖
-            </CardTitle>
-            <CardDescription>
-              用視覺化方式展示整合模型在多面向指標上的優勢
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-96 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <RadarChart data={current.radar}>
-                  <PolarGrid />
-                  <PolarAngleAxis dataKey="metric" />
-                  <PolarRadiusAxis />
-                  <Radar
-                    name="Best Base Model"
-                    dataKey="base"
-                    stroke="#93b5c6"
-                    fill="#93b5c6"
-                    fillOpacity={0.25}
-                  />
-                  <Radar
-                    name="Stacking Model"
-                    dataKey="stack"
-                    stroke="#d7816a"
-                    fill="#d7816a"
-                    fillOpacity={0.3}
-                  />
-                  <Tooltip />
-                  <Legend />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+      {/*混淆矩陣*/ }
+      <div className="flex gap-3 mt-4">
+        {["base", "stacking"].map((type) => (
+          <button
+            key={type}
+            onClick={() => setModelType(type)}
+            className={`px-4 py-2 rounded-xl border
+              ${modelType === type ? "bg-black text-white" : "bg-white text-gray-600"}
+            `}
+          >
+            {type === "base" ? "Base Model" : "Stacking Model"}
+          </button>
+        ))}
       </div>
 
+      <div className="flex flex-wrap gap-2 mt-4">
+        {modelOptions.map((id) => (
+          <button
+            key={id}
+            onClick={() => setSelectedModel(id)}
+            className={`px-3 py-1 rounded-lg border text-sm
+              ${selectedModel === id ? "bg-blue-500 text-white" : "bg-white"}
+            `}
+          >
+            {id}
+          </button>
+        ))}
+      </div>
+
+<div className="mt-6 grid gap-6 lg:grid-cols-2">
+  <ConfusionMatrixCard
+    title="最佳基礎模型混淆矩陣"
+    result={bestBaseResult}
+    rows={bestBaseConfusionRows}
+  />
+
+  <ConfusionMatrixCard
+    title="最佳堆疊模型混淆矩陣"
+    result={bestStackResult}
+    rows={bestStackConfusionRows}
+  />
+</div>
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
           <CardHeader>
@@ -2794,6 +3761,7 @@ function ResearchPage() {
               ROC 適合看整體區辨能力，PR
               曲線則更適合不平衡資料情境下的正類預測品質評估。
             </div>
+            
             <div className="rounded-2xl bg-[#f5efe4] p-4 shadow-sm">
               OOF 視覺化能說明 stacking 是否在各 fold
               上穩定優於單一模型，而不是只在單次切分下偶然提升。
@@ -2961,7 +3929,7 @@ function Footer({ currentPage, setCurrentPage }) {
   return (
     <footer className="border-t border-[#93b5c6]/15 bg-[#efe8dc]/90">
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm text-slate-500 sm:px-6 lg:px-8 md:flex-row md:items-center md:justify-between">
-        <div>兩分類資料堆疊整合學習器｜Research Showcase Website</div>
+        <div>兩分類資料堆疊整合學習器</div>
         <div className="flex flex-wrap gap-2">
           {pageItems.map((item) => (
             <button
