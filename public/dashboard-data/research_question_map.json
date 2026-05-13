@@ -1,0 +1,47 @@
+[
+  {
+    "Research_Question": 1.0,
+    "Focus": "不同資料量/特徵數下 odds 優劣",
+    "Suggested_Output": "odds_strategy_comparison.csv; odds_failure_case_summary.csv"
+  },
+  {
+    "Research_Question": 2.0,
+    "Focus": "綜合所有指標分析 odds",
+    "Suggested_Output": "odds_strategy_comparison.csv; composite_rank_summary.csv; odds_calibration_summary.csv"
+  },
+  {
+    "Research_Question": 3.0,
+    "Focus": "odds 相對 base 是否提升",
+    "Suggested_Output": "odds_delta_from_comprehensive.csv; odds_delta_from_delta_table.csv; dangerous_base_models.csv"
+  },
+  {
+    "Research_Question": 4.0,
+    "Focus": "odds 相對其他 stackers 優劣",
+    "Suggested_Output": "odds_vs_all_stackers.csv; composite_rank_summary.csv"
+  },
+  {
+    "Research_Question": 5.0,
+    "Focus": "F1-rank vs 4-rank 對 odds 的影響",
+    "Suggested_Output": "strategy_effect_on_odds.csv; odds_strategy_comparison.csv"
+  },
+  {
+    "Research_Question": 6.0,
+    "Focus": "哪種排序法對 odds 較好",
+    "Suggested_Output": "strategy_effect_on_odds.csv; nested_cv_odds_stability_summary.csv"
+  },
+  {
+    "Research_Question": 7.0,
+    "Focus": "哪些條件使 odds 發揮最大優勢",
+    "Suggested_Output": "diversity_vs_odds.csv; odds_weight_concentration_summary.csv; odds_calibration_summary.csv"
+  },
+  {
+    "Research_Question": 8.0,
+    "Focus": "哪些條件放大缺點/失效",
+    "Suggested_Output": "odds_failure_case_summary.csv; dangerous_base_models.csv; odds_calibration_summary.csv"
+  },
+  {
+    "Research_Question": 9.0,
+    "Focus": "優化哪些區塊可能持續增益",
+    "Suggested_Output": "oof_odds_weights_summary.csv; diversity_vs_odds.csv; nested_cv_odds_stability_summary.csv"
+  }
+]

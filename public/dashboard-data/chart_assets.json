@@ -1,0 +1,44 @@
+{
+  "static_plots": [
+    {
+      "key": "odds_logloss",
+      "title": "Odds LogLoss",
+      "src": "../analysis_output/plot_odds_logloss.png"
+    },
+    {
+      "key": "odds_roc_auc",
+      "title": "Odds ROC_AUC",
+      "src": "../analysis_output/plot_odds_roc_auc.png"
+    },
+    {
+      "key": "odds_pr_auc",
+      "title": "Odds PR_AUC",
+      "src": "../analysis_output/plot_odds_pr_auc.png"
+    },
+    {
+      "key": "odds_mcc",
+      "title": "Odds MCC",
+      "src": "../analysis_output/plot_odds_mcc.png"
+    },
+    {
+      "key": "delta_roc_auc",
+      "title": "Odds vs Best Base - Delta ROC_AUC",
+      "src": "../analysis_output/plot_odds_delta_roc_auc.png"
+    },
+    {
+      "key": "delta_pr_auc",
+      "title": "Odds vs Best Base - Delta PR_AUC",
+      "src": "../analysis_output/plot_odds_delta_pr_auc.png"
+    },
+    {
+      "key": "calibration_auc_ece",
+      "title": "Calibration ROC_AUC vs ECE",
+      "src": "../analysis_output/plot_odds_auc_vs_ece.png"
+    },
+    {
+      "key": "nested_selected_rate",
+      "title": "Nested CV Odds Selected Rate",
+      "src": "../analysis_output/plot_nested_cv_odds_selected_rate.png"
+    }
+  ]
+}

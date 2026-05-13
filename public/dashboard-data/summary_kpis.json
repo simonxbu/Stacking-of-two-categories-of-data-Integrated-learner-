@@ -1,0 +1,12 @@
+{
+  "dataset_count": 7,
+  "strategy_count": 27,
+  "odds_win_vs_best_base_rate": 0.111111,
+  "avg_delta_roc_auc": -0.0113,
+  "avg_delta_pr_auc": -0.015877,
+  "avg_delta_f1": -0.01036,
+  "avg_delta_mcc": -0.069576,
+  "avg_nested_cv_selected_rate": 0.166667,
+  "failure_case_count": 24,
+  "odds_top_rank_count": 1
+}

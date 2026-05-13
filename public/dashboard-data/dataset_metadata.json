@@ -1,0 +1,86 @@
+[
+  {
+    "Dataset": "adult",
+    "n_samples": 48842,
+    "n_features": 14,
+    "n_continuous": 6,
+    "n_categorical": 8,
+    "positive_rate": 0.2362,
+    "majority_rate": 0.7638,
+    "missing_total": 15,
+    "data_family": "mixed",
+    "imbalance_ratio": 3.2337002540220157
+  },
+  {
+    "Dataset": "behavior",
+    "n_samples": 2900,
+    "n_features": 7,
+    "n_continuous": 4,
+    "n_categorical": 3,
+    "positive_rate": 0.5141,
+    "majority_rate": 0.5141,
+    "missing_total": 0,
+    "data_family": "mixed",
+    "imbalance_ratio": 1.0580366330520683
+  },
+  {
+    "Dataset": "cancer",
+    "n_samples": 569,
+    "n_features": 30,
+    "n_continuous": 30,
+    "n_categorical": 0,
+    "positive_rate": 0.6274,
+    "majority_rate": 0.6274,
+    "missing_total": 0,
+    "data_family": "continuous",
+    "imbalance_ratio": 1.6838432635534084
+  },
+  {
+    "Dataset": "german",
+    "n_samples": 1000,
+    "n_features": 20,
+    "n_continuous": 3,
+    "n_categorical": 17,
+    "positive_rate": 0.7,
+    "majority_rate": 0.7,
+    "missing_total": 0,
+    "data_family": "mixed",
+    "imbalance_ratio": 2.3333333333333335
+  },
+  {
+    "Dataset": "ionosphere",
+    "n_samples": 351,
+    "n_features": 34,
+    "n_continuous": 32,
+    "n_categorical": 2,
+    "positive_rate": 0.641,
+    "majority_rate": 0.641,
+    "missing_total": 0,
+    "data_family": "continuous",
+    "imbalance_ratio": 1.785515320334262
+  },
+  {
+    "Dataset": "pumpkin",
+    "n_samples": 2500,
+    "n_features": 12,
+    "n_continuous": 12,
+    "n_categorical": 0,
+    "positive_rate": 0.52,
+    "majority_rate": 0.52,
+    "missing_total": 0,
+    "data_family": "continuous",
+    "imbalance_ratio": 1.0833333333333335
+  },
+  {
+    "Dataset": "water",
+    "n_samples": 3276,
+    "n_features": 9,
+    "n_continuous": 9,
+    "n_categorical": 0,
+    "positive_rate": 0.3901,
+    "majority_rate": 0.6099,
+    "missing_total": 1434,
+    "data_family": "continuous",
+    "imbalance_ratio": 1.563445270443476
+  }
+]
