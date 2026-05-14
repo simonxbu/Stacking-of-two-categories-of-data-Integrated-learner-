@@ -614,15 +614,15 @@ const processSteps = [
       desc: "依基礎模型結果中的 F1 分數由高至低排序，透過陡坡圖辨識陡降區段，排除表現明顯下降之模型，以降低弱模型對堆疊結果的干擾。",
     },
     {
-      title: "方法二：四值取法",
-      desc: "分別選取在 Precision、Recall、PR-AUC 與 ROC-AUC 指標下表現最佳之模型納入堆疊，以保留不同評估面向下具代表性的模型，提升整體預測能力。",
+      title: "方法二：四值排序法",
+      desc: "分別選取在Precision、Recall、PR-AUC與ROC-AUC指標下表現最佳之模型納入堆疊，以保留不同評估面向下具代表性的模型，提升整體預測能力。",
     },
   ],
   },
   {
     id: "integration",
     short: "整合",
-    title: "Stacking 與加權融合",
+    title: "Stacking與加權融合",
     desc: "將篩選出來的基礎模型輸出作為 meta 特徵或機率加權來源，建立最終整合模型。",
     panelTitle: "模型整合程序",
     panelDesc: "透過多模型融合提升最終分類表現",
@@ -641,34 +641,59 @@ const processSteps = [
     id: "analysis",
     short: "分析",
     title: "結果詮釋與比較分析",
-    desc: "從單一模型、堆疊整合模型與跨資料集層面觀察研究發現與應用價值。",
+    desc: "從模型表現、錯誤型態與跨資料集差異，整理單一模型與堆疊模型的研究發現。",
     panelTitle: "結果分析與研究詮釋",
-    panelDesc: "從模型表現與跨資料集差異整理研究發現",
+    panelDesc: "不只比較最高分模型，也從穩定性、錯誤型態與資料集特性解讀整合效果。",
+    panelItems: [
+      "比較最佳基礎模型與最佳堆疊模型在F1、MCC、PR-AUC與Balanced Accuracy上的差異",
+      "觀察混淆矩陣中的FP與FN，判斷模型主要錯誤來源",
+      "檢查不同Strategy/K下模型表現是否穩定，避免只依單次高分下結論",
+      "整理哪些資料集適合stacking，哪些資料集單一模型已足夠穩定",
+    ],
+    methods: [
+      {
+        title: "一、單一模型與堆疊模型比較",
+        desc: "先比較最佳base model與最佳stacking model的整體指標，確認堆疊後是否真正帶來提升，而不是只在某一個指標上略微改善。",
+      },
+      {
+        title: "二、錯誤型態分析",
+        desc: "透過混淆矩陣與FP / FN比例觀察模型偏誤方向。例如模型是否容易把負類誤判為正類，或是否漏判正類。",
+      },
+      {
+        title: "三、穩定性與篩選策略檢查",
+        desc: "比較同一基礎模型在不同Strategy與K下的表現，判斷模型是否穩定，並確認篩選策略是否會影響最終整合品質。",
+      },
+      {
+        title: "四、跨資料集研究結論",
+        desc: "將八個資料集的結果放在一起比較，觀察stacking在高維低樣本、類別不平衡、訊號型資料或混合型資料上的適用情境。",
+      },
+    ],
   },
 ];
+
 
 //數據與流程-基礎模型訓練流程
 const baseTrainingSteps = [
   {
     id: "base-split",
     short: "切分",
-    title: "資料切分與前處理管線建立",
-    desc: "將資料切分為訓練集與測試集，並依資料型態建立對應前處理流程。",
+    title: "資料切分與前處理設定",
+    desc: "先建立一致的訓練、驗證與測試資料條件，確保後續模型比較具有公平性。",
     panelTitle: "基礎模型訓練：資料切分與前處理",
-    panelDesc: "先建立一致的輸入條件，再進行模型訓練。",
+    panelDesc: "將資料轉換成可直接訓練的格式，並維持一致的模型輸入條件。",
     panelItems: [
-      "切割訓練集與測試集（8:2），再將訓練集切成訓練集與驗證集(8:2)",
-      "數值欄位標準化與分布修正",
-      "類別欄位編碼與格式轉換",
+      "將資料用Vakayil&Joseph(2022)提出的孿生資料分割法切分為訓練集與測試集，並保留驗證資料用於模型調整",
+      "針對數值型欄位進行標準化，降低尺度差異對模型的影響",
+      "將類別型欄位轉換為模型可讀取的數值格式",
     ],
   },
   {
     id: "base-train",
     short: "建模",
-    title: "多個基礎模型獨立訓練",
-    desc: "對 16 種基礎分類器分別訓練，保留預測結果與機率輸出。",
-    panelTitle: "基礎模型訓練：多模型並行建模",
-    panelDesc: "建立具有多樣性的基礎模型池。",
+    title: "多類型基礎模型獨立訓練",
+    desc: "訓練多種不同性質的分類器，建立具有異質性的基礎模型池。",
+    panelTitle: "基礎模型訓練：多模型建模",
+    panelDesc: "透過線性模型、樹模型、Boosting、距離式模型與機率模型，增加後續stacking可利用的模型差異。",
     modelGroups: [
       {
         category: "線性 / 判別",
@@ -689,66 +714,69 @@ const baseTrainingSteps = [
         ],
       },
       {
-        category: "其他",
+        category: "其他模型",
         models: ["SVM", "MLP", "KNN", "Gaussian NB", "Bernoulli NB"],
       },
     ],
+    panelItems: [
+      "基礎模型訓練過程中我們固定Optuna超參數搜索次數為50次",
+      "產生(Out of Folds)折外預測作為堆疊模型的輸入資料"
+    ]
   },
   {
     id: "base-eval",
     short: "評估",
-    title: "基礎模型結果彙整與排序",
-    desc: "使用 Accuracy、Precision、Recall 與 F1 比較模型表現，作為後續篩選依據。",
-    panelTitle: "基礎模型訓練：評估與排序",
-    panelDesc: "先看單模表現，再決定哪些模型進入下一階段。",
+    title: "基礎模型表現彙整與排序",
+    desc: "彙整各模型的分類表現，作為後續模型篩選與stacking輸入依據。",
+    panelTitle: "基礎模型訓練：結果彙整與排序",
+    panelDesc: "從多個評估指標觀察模型強弱，找出適合進入堆疊整合的候選模型。",
     panelItems: [
-      "統計 Accuracy / Precision / Recall / F1",
-      "比較模型在不同資料集上的差異",
-      "觀察弱模型與穩定模型的分界",
-      "作為 stacking 候選模型輸入",
+      "統計Accuracy、Precision、Recall、F1、ROC-AUC、PR-AUC 與 MCC...等多個指標",
+      "輸出基礎模型訓練結果總表供後續比較",
+      "觀察弱模型與穩定模型，避免低品質模型干擾整合結果"
     ],
   },
 ];
 
+//數據與流程-堆疊流程
 //數據與流程-堆疊流程
 const stackingFlowSteps = [
   {
     id: "stack-select",
     short: "篩選",
     title: "候選基礎模型篩選",
-    desc: "依排序結果排除明顯落後模型，降低弱模型干擾。",
+    desc: "根據排序結果挑選表現較佳且具代表性的模型，降低弱模型對整合結果的干擾。",
     panelTitle: "堆疊流程：候選模型篩選",
-    panelDesc: "只保留較具代表性與穩定性的模型進入整合。",
+    panelDesc: "在進入stacking前，先排除明顯落後的模型，保留較穩定且可能互補的候選模型。",
     panelItems: [
-      "依 F1 或 Accuracy 排序",
-      "觀察陡降區段並排除弱模型",
-      "保留具互補性的候選模型",
+      "依F1排序或四值排序法挑選候選模型",
+      "透過F1陡坡圖觀察模型表現是否出現明顯落差",
+      "保留高表現或具有互補性的模型，避免弱模型稀釋整合效果",
     ],
   },
   {
     id: "stack-oof",
     short: "生成",
-    title: "建立 OOF 次層特徵",
-    desc: "以交叉驗證取得 base models 的 OOF prediction，形成 meta features。",
+    title: "建立OOF次層特徵",
+    desc: "利用基礎模型的OOF prediction建立meta features，讓第二層模型學習各模型的預測行為。",
     panelTitle: "堆疊流程：建立次層輸入",
-    panelDesc: "避免資料洩漏，讓次層學習器看到更可靠的輸入。",
+    panelDesc: "使用OOF預測作為stacking的訓練資料，可降低資料洩漏風險，讓整合模型更接近真實泛化情境。",
     panelItems: [
-      "以 K-fold 取得每個 base model 的 OOF prediction",
-      "將各模型機率輸出組成次層特徵矩陣",
-      "同步保留測試集預測供最終整合使用",
+      "以交叉驗證產生各基礎模型的OOF prediction",
+      "將多個模型的預測機率組合成meta feature matrix"
     ],
   },
   {
     id: "stack-meta",
     short: "整合",
-    title: "訓練 stacking 與加權融合模型",
-    desc: "使用 meta learner 與多種機率加權方法，建立最終預測。",
-    panelTitle: "堆疊流程：meta learner 與融合",
-    panelDesc: "比較不同整合策略的表現差異。",
+    title: "訓練stacking與加權整合模型",
+    desc: "使用不同meta learner與機率加權方法整合基礎模型預測，建立最終分類結果。",
+    panelTitle: "堆疊流程：meta learner與融合策略",
+    panelDesc: "比較學習式stacking與非學習式加權方法，觀察整合後是否提升分類效能與穩定性。",
     panelItems: [
-      "Logistic Regression / XGBoost / CatBoost Stacking",
-      "Voting、Odds Weighting、Inverse Variance Weighting",
-      "比較整合前後的穩定性與預測品質",
+      "使用Logistic Regression、XGBoost與CatBoost作為meta learner",
+      "比較Average Voting、Odds Weighting與Inverse Variance Weighting",
+      "以F1、MCC、PR-AUC與Balanced Accuracy評估整合後表現",
     ],
   },
 ];
