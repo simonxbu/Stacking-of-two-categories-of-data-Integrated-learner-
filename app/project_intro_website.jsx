@@ -495,7 +495,7 @@ const processSteps = [
     panelTitle: "資料蒐集程序",
     panelDesc: "透過公開平台蒐集不同領域資料集，建立多資料情境研究基礎。",
     panelText:
-      "本研究主要透過 Kaggle 與 UCI Machine Learning Repository 蒐集公開資料集，涵蓋人格特質、醫療診斷、金融行為與訊號辨識等不同情境，以提升研究比較的多樣性與代表性。",
+      "我們主要透過 Kaggle 與 UCI Machine Learning Repository 蒐集公開資料集，涵蓋人格特質、醫療診斷、金融行為與訊號辨識等不同情境，以提升研究比較的多樣性與代表性。",
     links: [
       {
         name: "Extrovert vs. Introvert Behavior",
@@ -796,7 +796,7 @@ const litCards = [
     desc: "弱模型過多時可能稀釋整合優勢，因此模型篩選策略是核心研究變項之一。",
   },
   {
-    title: "本研究的差異化貢獻",
+    title: "專題與論文差異",
     desc: "同時比較多資料集、多基礎模型、多元學習器與多種加權方式，形成完整實驗框架。",
   },
 ];
@@ -990,7 +990,7 @@ function HomePage({ setCurrentPage }) {
               </CardHeader>
               <CardContent className="space-y-4 text-sm leading-7 text-slate-600">
                 <p>
-                  本研究比較多種二元分類基礎模型，並透過不同的 stacking
+                  我們比較多種二元分類基礎模型，並透過不同的 stacking
                   與機率加權整合方式，檢驗是否能在多資料集任務中提升分類準確度、穩定性與泛化能力。
                 </p>
                 <p>
@@ -1014,7 +1014,7 @@ function HomePage({ setCurrentPage }) {
                   <CardTitle className="text-lg">研究目的</CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm leading-7 text-slate-600">
-                  本研究旨在針對二元分類問題，提出一種「基於勝算的堆疊演算法」（Odds-Based Stacking Algorithm）。
+                  我們針對二元分類問題，提出一種「基於勝算的堆疊演算法」（Odds-Based Stacking Algorithm）。
                   該方法透過計算k個基礎模型之預測勝算（Odds）及其比例關係，將其轉化為堆疊過程中的加權依據，進而建構具備統計解釋性的水平堆疊（Horizontal Stacking）機制。
                 </CardContent>
               </Card>
@@ -1120,7 +1120,6 @@ function DataPage() {
       <SectionTitle
         eyebrow="數據與流程"
         title="研究流程與建模步驟視覺化"
-        description="本頁聚焦研究執行脈絡，將整體流程、基礎模型訓練流程與堆疊流程拆成三種視圖，讓讀者更清楚掌握方法設計。"
       />
       <div className="mt-10 space-y-6">
         <Card className="overflow-hidden rounded-[32px] border border-white/60 bg-white/75 shadow-[0_18px_50px_rgba(147,181,198,0.16)] backdrop-blur-sm">
@@ -1131,9 +1130,6 @@ function DataPage() {
                   <Workflow className="h-5 w-5 text-[#93b5c6]" />
                   研究流程視圖
                 </CardTitle>
-                <CardDescription>
-                  可切換整體流程、基礎模型訓練流程與堆疊流程
-                </CardDescription>
               </div>
               <div className="flex flex-wrap gap-2">
                 {flowGroups.map((group) => (
@@ -1150,9 +1146,6 @@ function DataPage() {
           </CardHeader>
           <CardContent className="grid gap-6 lg:grid-cols-[1fr_1fr]">
             <div className="rounded-[28px] border border-[#93b5c6]/18 bg-white/55 p-6 backdrop-blur-sm">
-              <div className="mb-4 text-sm font-medium text-slate-500">
-                點擊流程步驟查看細節
-              </div>
               <FlowDiagram
                 steps={activeSteps}
                 activeStep={activeStep}
@@ -1313,7 +1306,6 @@ function MethodPage() {
       <SectionTitle
         eyebrow="核心方法論"
         title="Stacking 概述、LaTeX 公式與元學習器策略"
-        description="這個區塊以論文展示頁的方式呈現方法：先說明概念，再用 LaTeX 公式表達，最後補上模型選擇邏輯。"
       />
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
@@ -1348,7 +1340,7 @@ function MethodPage() {
         <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
           <CardHeader>
             <CardTitle>模型篩選策略</CardTitle>
-            <CardDescription>本研究透過兩種模型篩選方法，挑選表現較佳之基礎模型，並將其納入後續堆疊模型建構。</CardDescription>
+            <CardDescription>我們透過兩種模型篩選方法，挑選表現較佳之基礎模型，並將其納入後續堆疊模型建構。</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 text-sm leading-6 text-slate-600 max-h-[360px] overflow-y-auto pr-2">
             <div className="space-y-3">
@@ -3455,154 +3447,815 @@ function ResearchPage() {
   );
 }
 
+const STACKING_ANALYSIS = {
+  MCC: {
+    title: "MCC 結果分析",
+    description: [
+      "整體而言，堆疊模型並非在所有資料集上皆能優於最佳基礎模型，但在部分資料集中仍能帶來小幅提升，顯示當基礎模型之間具有互補性時，堆疊整合能有效提升分類表現。",
+
+      "【堆疊方法表現較佳的資料集】",
+
+      "* adult：CatBoost stacking MCC = 0.648，高於最佳基礎模型 base XGB 的 0.642。",
+      "* behavior：XGBoost stacking MCC = 0.887，高於最佳基礎模型的 0.880。",
+      "* ionosphere：avg、xgboost 與 logistic stacking 皆達 0.939，明顯高於 base SVM 的 0.909，為提升最明顯的資料集之一。",
+
+      "【堆疊方法效果不佳的資料集】",
+
+      "* german：最佳基礎模型 base LDA MCC = 0.511，高於最佳堆疊方法 odds 的 0.496。",
+      "* water：base MLP MCC = 0.289，而最佳堆疊方法 avg 僅 0.246，odds stacking 更降至 0。",
+
+      "此結果顯示，當資料集具有樣本數較少、特徵較多、資料結構複雜，或模型預測機率不穩定等特性時，堆疊方法可能無法有效提升分類表現，甚至因錯誤累積而降低整體分類平衡。",
+
+      "【勝算堆疊（Odds Stacking）分析】",
+
+      "勝算堆疊在 MCC 指標下的整體穩定性較不足。",
+
+      "* 在 sonar 中，勝算堆疊 MCC 達 0.860，能與最佳方法並列。",
+      "* 在 german 中，也屬於表現較佳的堆疊方法之一。",
+      "* 然而在 adult、ionosphere 與 water 中，其 MCC 皆低於其他主要堆疊方法，其中 water 更降至 0。",
+
+      "此結果代表，雖然勝算堆疊能依據模型 F1 表現調整權重，但若權重過度集中於部分模型，可能導致分類結果失衡，進而降低整體穩定性。"
+    ]
+  },
+  PR_AUC: {
+    title: "PR_AUC 結果分析",
+    description: [
+      "整體而言，堆疊模型在 PR_AUC 指標上的表現較 MCC 更穩定。在多數資料集中，最佳堆疊方法皆能略高於最佳基礎模型，顯示堆疊方法對於正類樣本的排序能力具有一定提升效果。",
+
+    "【堆疊方法具有提升效果的資料集】",
+
+    "* adult：CatBoost stacking PR_AUC = 0.830，高於 base XGB 的 0.827。",
+    "* behavior：XGBoost stacking 達 0.982，高於 base GB 的 0.977。",
+    "* german：Logistic stacking 為 0.876，略高於 base SVM 的 0.875。",
+    "* water：Logistic stacking 達 0.630，高於 base QDA 的 0.625。",
+
+    "【基礎模型與堆疊模型差異較小的資料集】",
+
+    "* cancer：base MLP 與 Logistic stacking 皆達 0.998，顯示資料本身分類訊號明確，模型表現已接近飽和。",
+    "* pumpkin：base CAT、avg、logistic 與 odds 的 PR_AUC 皆約為 0.943，差距極小，代表堆疊主要提供穩定性而非明顯增益。",
+    "* sonar：Logistic stacking 與 base HGB 皆達 0.984，odds stacking 為 0.981，表現接近但未超越最佳方法。",
+
+    "【PR_AUC 與 MCC 的差異觀察】",
+
+    "部分資料集的 PR_AUC 與 MCC 結果並不一致，顯示模型在「排序能力」與「最終分類結果」之間可能存在差異。",
+
+    "* water：勝算堆疊在 MCC 中為 0，但 PR_AUC 仍達 0.626，甚至略高於 base QDA 的 0.625。",
+    "* ionosphere：勝算堆疊 PR_AUC 達 0.999，屬於最佳方法之一，但 MCC 僅 0.879，低於其他堆疊方法與最佳基礎模型。",
+
+    "此結果表示，勝算堆疊雖然可能無法在最終分類閾值下取得良好平衡，但仍具備一定的正類排序能力，因此在 PR_AUC 指標上仍能維持較高表現。"
+  ]
+  }
+};
+
+const ODDS_ANALYSIS = {
+  MCC: {
+    title: "MCC 結果分析",
+    description: [
+      "勝算堆疊在 MCC 上的表現並不穩定，顯示其效果高度依賴資料集特性與模型篩選方式。behavior、cancer、sonar 等資料集的 MCC 較高，代表當基礎模型本身穩定且資料訊號清楚時，勝算堆疊可以維持良好的分類平衡。",
+
+      "然而 adult、german、water 的 MCC 明顯較低，尤其 water 的 MCC 接近 0，表示勝算堆疊雖可能提高正類預測比例，但容易造成分類結果過度偏向正類，導致部分負類無法被正確辨識。",
+
+      "此外，F1-rank 取不同前k個模型的結果變動也顯示，勝算堆疊對模型組合非常敏感。當納入的基礎模型品質穩定且互補性高時，勝算堆疊可接近最佳模型；但若納入模型偏誤方向相近，或模型校準不佳，MCC會快速下降。"
+    ]
+  },
+  PR_AUC: {
+    title: "PR_AUC 結果分析",
+    description: [
+      "PR_AUC 圖顯示，勝算堆疊在多數資料集上仍具有不錯的正類排序能力，特別是在cancer、ionosphere、pumpkin、sonar等資料集上，PR_AUC維持在較高水準。",
+
+      "然而，PR_AUC高並不代表實際分類結果一定好。以water為例，勝算堆疊的PR_AUC有在0.6以上，但MCC卻接近0，表示模型對正類排序仍有一定能力。",
+
+      "整體來看，勝算堆疊在PR_AUC上比在MCC上更穩定，表示它對「正類排序」較有幫助，但對「平衡分類決策」仍需進一步優化。"
+    ]
+  }
+};
 //總結頁面
 function SummaryPage() {
+  const [activeTab, setActiveTab] = useState("MCC");
   return (
     <section>
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <SectionTitle
           eyebrow="總結"
-          title="研究結果、關鍵發現圖解與未來方向"
-          description="以更精煉的方式收束整份網站內容，讓讀者在離開前仍保有清楚的研究印象。"
+          title="研究結果分析與未來研究方向"
         />
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-          <Card className="rounded-[28px] border border-[#93b5c6]/20 bg-white/82 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
-            <CardHeader className="border-b border-[#93b5c6]/12 bg-[#ddedaa]/18">
-              <CardTitle className="text-slate-900">研究結果</CardTitle>
+        <div className="mt-10 w-full">
+          <Card className="rounded-[32px] border border-[#93b5c6]/20 bg-white/82 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+            <CardHeader className="space-y-1 border-b border-[#93b5c6]/12 bg-[#ddedaa]/18">
+              <CardTitle className="text-left text-lg font-semibold text-slate-900">
+                最佳基礎模型與堆疊結果比較
+              </CardTitle>
+
+              {/* 指標切換按鈕 */}
+              <div className="flex justify-start gap-3">
+                <button
+                  onClick={() => setActiveTab("MCC")}
+                  className={`
+                    rounded-full px-5 py-1 text-sm font-medium
+                    ${
+                      activeTab === "MCC"
+                       ? "bg-[#93b5c6] text-white shadow-sm"
+                       : "bg-[#f5efe4] text-slate-700 hover:bg-[#ddedaa]/70"
+                    }
+                  `}
+                >                
+                  MCC
+                </button>
+
+                <button
+                  onClick={() => setActiveTab("PR_AUC")}
+                  className={`
+                    rounded-full px-5 py-1 text-sm font-medium transition-all duration-200
+                    ${
+                      activeTab === "PR_AUC"
+                       ? "bg-[#93b5c6] text-white shadow-sm"
+                       : "bg-[#f5efe4] text-slate-700 hover:bg-[#ddedaa]/70"
+                    }
+                  `}
+                >         
+                  PR_AUC
+                </button>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4 text-sm leading-7 text-slate-700">
-              <p>
-                <span className="font-semibold text-[#d7816a]">stacking</span>{" "}
-                整合學習提供了比單一模型更具潛力的預測架構，尤其適合多資料集、模型表現差異明顯的情境。
-              </p>
-              <p>
-                模型篩選與{" "}
-                <span className="font-semibold text-[#93b5c6]">
-                  meta learner
-                </span>{" "}
-                選擇是最關鍵的兩個設計點，會直接影響最終整合品質與模型穩定性。
-              </p>
+
+            {/* 下方左右切版 */}
+            <CardContent className="grid gap-5 p-6 lg:grid-cols-2">
+              {/* 左側圖片區 */}
+              <div className="rounded-[24px] bg-white p-5 shadow-sm">
+                <div className="flex h-full min-h-[320px] items-center justify-center rounded-[18px] border border-dashed border-[#93b5c6]/30 text-slate-400">
+                  {activeTab === "MCC" && (
+                   <img
+                     src="/MCC_Comparison.png"
+                     alt="MCC Comparison"
+                     className="max-h-[280px] w-full object-contain"
+                   />
+                  )}
+
+                   {activeTab === "PR_AUC" && (
+                   <img
+                     src="/PR_AUC_Comparison.png"
+                     alt="PR_AUC Comparison"
+                     className="max-h-[280px] w-full object-contain"
+                   />
+                  )}
+                </div>
+              </div>
+
+              {/* 右側說明區 */}
+              <div className="rounded-[24px] bg-[#f8f3e9] p-6">
+                <div className="space-y-4 text-sm leading-7 text-slate-700">
+                  <h3 className="text-base font-semibold text-slate-900">
+                    {STACKING_ANALYSIS[activeTab].title}
+                  </h3>
+
+                  <div className="max-h-[400px] overflow-y-auto pr-2 space-y-4 scrollbar-thin scrollbar-thumb-[#c9b79c] scrollbar-track-transparent">
+                    {STACKING_ANALYSIS[activeTab].description.map((point, index) => {
+                      if (point.startsWith("【") && point.endsWith("】")) {
+                        return (
+                          <h4
+                            key={index}
+                            className="pt-2 text-sm font-semibold text-slate-900"
+                          >
+                            {point.replace(/[【】]/g, "")}
+                          </h4>
+                        );
+                      }
+                      if (point.startsWith("*")) {
+                        return (
+                          <ul key={index} className="list-disc pl-5">
+                            <li className="text-slate-700">
+                              {point.replace("* ", "")}
+                            </li>
+                          </ul>
+                        );
+                      }
+                      return (
+                        <p key={index} className="text-slate-700 leading-7">
+                          {point}
+                        </p>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
+        </div> 
+       
+          <div className="mt-10 w-full">
+          <Card className="rounded-[32px] border border-[#93b5c6]/20 bg-white/82 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+            <CardHeader className="space-y-4 border-b border-[#93b5c6]/12 bg-[#ddedaa]/18">
+              <CardTitle className="text-left text-lg font-semibold text-slate-900">
+                勝算堆疊結果比較
+              </CardTitle>
 
-          <Card className="rounded-[28px] border border-[#93b5c6]/20 bg-white/82 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
-            <CardHeader className="border-b border-[#93b5c6]/12 bg-[#f0cf65]/14">
-              <CardTitle className="text-slate-900">研究價值圖解</CardTitle>
+              {/* 指標切換按鈕 */}
+              <div className="flex justify-start gap-3">
+                <button
+                  onClick={() => setActiveTab("MCC")}
+                  className={`
+                    rounded-full px-5 py-1 text-sm font-medium transition-all duration-200
+                    ${
+                      activeTab === "MCC"
+                       ? "bg-[#93b5c6] text-white shadow-sm"
+                       : "bg-[#f5efe4] text-slate-700 hover:bg-[#ddedaa]/70"
+                    }
+                  `}
+                >                
+                  MCC
+                </button>
+
+                <button
+                  onClick={() => setActiveTab("PR_AUC")}
+                  className={`
+                    rounded-full px-5 py-1 text-sm font-medium transition-all duration-200
+                    ${
+                      activeTab === "PR_AUC"
+                       ? "bg-[#93b5c6] text-white shadow-sm"
+                       : "bg-[#f5efe4] text-slate-700 hover:bg-[#ddedaa]/70"
+                    }
+                  `}
+                >         
+                  PR_AUC
+                </button>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4 text-sm leading-7 text-slate-700">
-              <div className="rounded-2xl border border-[#93b5c6]/12 bg-[#f7f3ec] p-5">
-                <div className="font-semibold text-[#d7816a]">1. 多模型互補</div>
-                <div className="mt-2 text-slate-600">
-                  不同基礎模型擅長不同資料模式，stacking 能夠整合這些互補訊號。
+
+            {/* 下方左右切版 */}
+            <CardContent className="grid gap-5 p-6 lg:grid-cols-2">
+              {/* 左側圖片區 */}
+              <div className="rounded-[24px] bg-white p-5 shadow-sm">
+                <div className="flex h-full min-h-[320px] items-center justify-center rounded-[18px] border border-dashed border-[#93b5c6]/30 text-slate-400">
+                  {activeTab === "MCC" && (
+                   <img
+                     src="/MCC stack_odds.png"
+                     alt="MCC stack_odds"
+                     className="max-h-[280px] w-full object-contain"
+                   />
+                  )}
+
+                   {activeTab === "PR_AUC" && (
+                   <img
+                     src="/PR_AUC stack_odds.png"
+                     alt="PR_AUC stack_odds"
+                     className="max-h-[280px] w-full object-contain"
+                   />
+                  )}
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-[#93b5c6]/12 bg-[#f7f3ec] p-5">
-                <div className="font-semibold text-[#93b5c6]">2. 提升穩定性</div>
-                <div className="mt-2 text-slate-600">
-                  整合模型不只追求最佳分數，也能降低單一模型波動與資料依賴性。
+              {/* 右側說明區 */}
+              <div className="rounded-[24px] bg-[#f8f3e9] p-6">
+                <div className="space-y-4 text-sm leading-7 text-slate-700">
+                  <h3 className="text-base font-semibold text-slate-900">
+                    {ODDS_ANALYSIS[activeTab].title}
+                  </h3>
+
+                  <div className="space-y-4">
+                    {ODDS_ANALYSIS[activeTab].description.map((point, index) => {
+                      // 支援 **粗體**
+                      const parts = point.split(/(\*\*.*?\*\*)/);
+
+                      return (
+                        <p key={index} className="text-slate-700 leading-7">
+                          {parts.map((part, i) =>
+                            part.startsWith("**") && part.endsWith("**") ? (
+                              <strong key={i} className="font-bold text-slate-900">
+                                {part.slice(2, -2)}
+                              </strong>
+                            ) : (
+                              part
+                            )
+                          )}
+                        </p>
+                      );
+                    })}
+                  </div>
+                  </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div> 
+
+        <div className="mt-6">
+          <Card className="rounded-[28px] border shadow-[0_12px_30px_rgba(147,181,198,0.08)] bg-white/80">
+            <CardContent className="p-6 space-y-5">
+
+              {/* 標題 */}
+             <CardHeader className="space-y-4 border-b border-[#93b5c6]/12 bg-[#ddedaa]/18">
+              <CardTitle className="text-left text-lg font-semibold text-slate-900">
+                混淆矩陣結果比較
+              </CardTitle>
+              </CardHeader>
+              {/* 左右切版 */}
+            <div className="grid gap-6 lg:grid-cols-2 items-start">
+
+              {/* 左側圖片 */}
+              <div className="rounded-[24px] bg-white p-5 shadow-sm">
+                <div className="flex h-full min-h-[320px] items-center justify-center rounded-[18px] border border-dashed border-[#93b5c6]/30">
+                  <img
+                    src="/confusion matrix.png"
+                    alt="Confusion Matrix"
+                    className="max-h-[320px] w-full object-contain"
+                  />
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-[#93b5c6]/12 bg-[#f7f3ec] p-5">
-                <div className="font-semibold text-[#d7816a]">3. 強化可展示性</div>
-                <div className="mt-2 text-slate-600">
-                  研究方法、流程與結果透過網站視覺化後，更適合專題發表與口頭報告。
+              {/* 右側說明 */}
+              <div className="rounded-[24px] bg-[#f8f3e9] p-6">
+                <div className="space-y-4 text-sm leading-7 text-slate-700">
+
+                  <h3 className="text-base font-semibold text-slate-900">
+                    混淆矩陣結果分析
+                  </h3>
+
+                  <div className="max-h-[300px] overflow-y-auto pr-2 space-y-4 scrollbar-thin scrollbar-thumb-[#c9b79c] scrollbar-track-transparent">
+
+                    <p>
+                      混淆矩陣差異圖顯示，最佳堆疊模型與最佳基礎模型之間的差異主要來自「預測類別分布的移動」，而非所有資料集皆呈現一致性的性能提升。
+                    </p>
+
+                    <p>
+                      在 adult、german 與 water 資料集中，堆疊模型明顯提升預測為正類（P1）的比例，使 TP 增加、FN 減少，代表模型對正類具有更高的敏感度。然而，同時也導致 FP 上升，表示部分負類（T0）被錯誤分類為正類，造成 specificity 下降。因此，在這類資料集中，堆疊模型雖傾向提升 recall，但可能以犧牲分類平衡為代價，使 MCC 的改善幅度有限，甚至出現下降。
+                    </p>
+
+                    <p>
+                      相對地，在 behavior 與 ionosphere 資料集中，堆疊模型主要減少 T0 被誤判為 P1 的情況，顯示其在提升負類辨識能力的同時，仍能維持對正類的穩定預測。特別是在 ionosphere 中，此種雙向錯誤的同步改善使整體分類平衡更佳，因此 MCC 的提升較為明顯。
+                    </p>
+
+                    <p>
+                      而在 cancer 與 sonar 資料集中，混淆矩陣幾乎沒有明顯變化，表示堆疊模型與最佳基礎模型的分類結果高度接近。此現象反映基礎模型本身已具備良好可分性，模型性能接近飽和，因此堆疊所能帶來的額外增益有限。
+                    </p>
+                  </div>
                 </div>
               </div>
+            </div>
+          </CardContent>
+          </Card>
+        </div> 
+         {/* 研究結論與討論 */}
+        <div className="mt-10 w-full">
+          <Card className="rounded-[32px] border border-[#93b5c6]/20 bg-white/82 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+
+            <CardHeader className="space-y-4 border-b border-[#93b5c6]/12 bg-[#ddedaa]/18">
+              <CardTitle className="text-left text-lg font-semibold text-slate-900">
+                研究結論與討論
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent className="p-6">
+              <div className="max-h-[500px] overflow-y-auto pr-2 space-y-8 text-sm leading-7 text-slate-700 scrollbar-thin scrollbar-thumb-[#c9b79c] scrollbar-track-transparent">
+
+                {/* 1 */}
+                <section className="space-y-3">
+                  <h3 className="text-base font-semibold text-slate-900">
+                    堆疊模型的整體表現
+                  </h3>
+                  <p>
+                    從 MCC 的比較結果可以看出，堆疊方法在部分資料集上確實能提升整體分類平衡。
+                    當不同基礎模型各自擅長處理不同類型樣本時，堆疊模型能整合各模型優勢，使分類結果更加穩定。
+                  </p>
+                  <p>
+                    然而，在部分資料集中，最佳基礎模型仍優於所有堆疊方法，
+                    在該資料集中，單一強模型已具有足夠的分類能力，而堆疊方法的增益有限。堆疊模型的效果仍取決於資料特性、基礎模型互補性、模型篩選方式與權重設計。
+                  </p>
+                  {/* 分隔線 */}
+                  <div className="mt-6 border-t border-[#93b5c6]/30" />
+                </section>
+
+                {/* 2 */}
+                <section className="space-y-3">
+                  <h3 className="text-base font-semibold text-slate-900">
+                    混淆矩陣觀察
+                  </h3>
+                  <p>
+                    從混淆矩陣差異圖可以發現，部分最佳堆疊模型較傾向預測為正類，可能提升正類召回能力，但也會犧牲部分負類辨識能力。
+                    最佳堆疊模型不一定只是「變好」或「變差」，而是會改變模型在正類與負類之間的預測取捨。
+                  </p>
+                  <p>
+                    在adult、german和water資料集中，堆疊模型較偏向預測正類，使TP增加的同時也帶來FP增加；其餘資料集則差異較小或方向不一致。
+                    因此，堆疊模型不僅影響整體效能，也會改變模型的分類傾向與判斷方向，
+                    使其在不同資料集上呈現不同錯誤型態。
+                  </p>
+                  {/* 分隔線 */}
+                  <div className="mt-6 border-t border-[#93b5c6]/30" />
+                </section>
+
+                {/* 3 */}
+                <section className="space-y-3">
+                  <h3 className="text-base font-semibold text-slate-900">
+                    勝算堆疊（Odds Stacking）分析
+                  </h3>
+
+                  <p>
+                    勝算堆疊透過 F1 表現分配權重，使較佳模型具有更高影響力。
+                  </p>
+
+                  <div className="space-y-2">
+                    <p className="font-medium text-slate-800">優點</p>
+                    <ul className="list-disc pl-5 space-y-1">
+                      <li>在 PR_AUC 與 ROC_AUC 上部分資料集表現良好</li>
+                      <li>具備一定的正類排序能力</li>
+                    </ul>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="font-medium text-slate-800">限制</p>
+                    <ul className="list-disc pl-5 space-y-1">
+                      <li>MCC 穩定性不足</li>
+                      <li>部分資料集分類失衡</li>
+                      <li>權重可能過度集中於特定模型</li>
+                    </ul>
+                  </div>
+
+                  <p>
+                    此外，勝算堆疊對模型篩選方式相當敏感，並非模型數量越多效果越好，
+                    而是取決於模型之間的互補性與誤差分布。
+                  </p>
+                  {/* 分隔線 */}
+                  <div className="mt-6 border-t border-[#93b5c6]/30" />
+                </section>
+
+                {/* 4 */}
+                <section className="space-y-3">
+                  <h3 className="text-base font-semibold text-slate-900">
+                    整體研究發現
+                  </h3>
+                  <p>
+                    結果顯示，堆疊整合學習在二元分類問題中具有一定效果，
+                    尤其在提升正類排序能力方面較為明顯。
+                  </p>
+                  <p>
+                    若希望同時提升整體分類平衡，仍需搭配模型篩選、權重設計與閾值調整等策略。
+                  </p>
+                  <p>
+                    此外，最佳基礎模型仍是重要比較基準，因為部分資料集中的單一模型已具備接近飽和的表現，
+                    堆疊方法未必能進一步超越。
+                  </p>
+                  {/* 分隔線 */}
+                  <div className="mt-6 border-t border-[#93b5c6]/30" />
+                </section>
+               </div>
             </CardContent>
           </Card>
         </div>
+            <div className="mt-10 w-full">
+              <Card className="rounded-[32px] border border-[#93b5c6]/20 bg-white/82 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-3">
-          {[
-            {
-              text: "擴充更多資料集並驗證泛化能力",
-              tone: "bg-[#ddedaa]/30 border-[#ddedaa]/60 text-slate-800",
-            },
-            {
-              text: "加入機率校正、OOF 分析與混淆矩陣展示",
-              tone: "bg-[#f0cf65]/22 border-[#f0cf65]/55 text-slate-800",
-            },
-            {
-              text: "建立更完整的互動式實驗儀表板與部署頁面",
-              tone: "bg-[#93b5c6]/20 border-[#93b5c6]/45 text-slate-800",
-            },
-          ].map((item) => (
-            <Card
-              key={item.text}
-              className={`rounded-[28px] border shadow-[0_12px_30px_rgba(147,181,198,0.08)] ${item.tone}`}
-            >
-              <CardContent className="p-6 text-sm leading-7 font-medium">
-                {item.text}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                <CardHeader className="space-y-4 border-b border-[#93b5c6]/12 bg-[#ddedaa]/18">
+                  <CardTitle className="text-left text-lg font-semibold text-slate-900">
+                    未來研究方向
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent className="p-6">
+                  <div className="max-h-[450px] overflow-y-auto pr-2 space-y-8 text-sm leading-7 text-slate-700 scrollbar-thin scrollbar-thumb-[#c9b79c] scrollbar-track-transparent">
+
+                    {/* 1 */}
+                    <section className="space-y-3">
+                      <h3 className="text-base font-semibold text-slate-900">
+                        模型篩選機制優化
+                      </h3>
+
+                      <p>
+                        未來可改良模型篩選方式，而非僅依照 F1 排名選擇模型。
+                      </p>
+
+                      <p>可考慮以下指標作為初步篩選依據：</p>
+
+                      <ul className="list-disc pl-5 space-y-1">
+                        <li>MCC</li>
+                        <li>PR_AUC</li>
+                        <li>ROC_AUC</li>
+                      </ul>
+
+                      <p>
+                        並搭配向前貪婪選擇法（Forward Greedy Selection）進行模型組合挑選，
+                        以提升整體穩定性與互補性。
+                      </p>
+
+                      {/* 分隔線 */}
+                      <div className="mt-6 border-t border-[#93b5c6]/30" />
+                    </section>
+
+                    {/* 2 */}
+                    <section className="space-y-3">
+                      <h3 className="text-base font-semibold text-slate-900">
+                        權重設計改良
+                      </h3>
+
+                      <p>
+                        目前勝算堆疊主要依賴 F1 指標進行加權，未來可進一步設計更精細的權重機制。
+                      </p>
+
+                      <ul className="list-disc pl-5 space-y-1">
+                        <li>複合式權重機制</li>
+                        <li>多指標加權方式</li>
+                        <li>動態權重調整方法</li>
+                      </ul>
+
+                      <p>
+                        使模型的正類辨識能力、分類平衡性與機率穩定性都能同時納入考量。
+                      </p>
+
+                      {/* 分隔線 */}
+                      <div className="mt-6 border-t border-[#93b5c6]/30" />
+                    </section>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            <div className="mt-10 w-full">
+              <Card className="rounded-[32px] border border-[#93b5c6]/20 bg-white/82 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+
+                <CardHeader className="space-y-4 border-b border-[#93b5c6]/12 bg-[#ddedaa]/25">
+                  <CardTitle className="text-left text-lg font-semibold text-slate-900">
+                    最終結論
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent className="p-6">
+                  <div className="max-h-[400px] overflow-y-auto pr-2 space-y-6 text-sm leading-7 text-slate-700 scrollbar-thin scrollbar-thumb-[#c9b79c] scrollbar-track-transparent">
+
+                    {/* 1 */}
+                    <section className="space-y-3">
+                      <p className="text-slate-700 leading-7">
+                        堆疊模型並非單純追求最高分的方法，而是一種需要依據資料特性進行調整的整合策略。
+                      </p>
+
+                      <p className="text-slate-700 leading-7">
+                        最終結果顯示，不同資料集適合的堆疊方式並不相同，也不存在一種能在所有情況下皆表現最佳的方法。
+                      </p>
+                    </section>
+
+                    {/* 2 */}
+                    <section className="space-y-3">
+                      <p className="text-slate-700 leading-7">
+                        未來若能更深入分析：
+                      </p>
+
+                      <ul className="list-disc pl-5 space-y-1 text-slate-700">
+                        <li>資料型態</li>
+                        <li>模型互補性</li>
+                        <li>權重設計方式</li>
+                      </ul>
+
+                      <p className="text-slate-700 leading-7">
+                        堆疊方法在穩定性與分類效果上仍具有相當大的改進空間。
+                      </p>
+                    </section>
+
+                  </div>
+                </CardContent>
+
+              </Card>
+            </div>
       </div>
-    </section>
+     </section>
   );
 }
 
 //文獻脈絡頁面
 function LiteraturePage() {
+  const literaturePapers = [
+    {
+      tag: "文獻一｜Stacked Generalization",
+      author: "Nair et al. (2022)",
+      title: "Combining Varied Learners for Binary Classification Using Stacked Generalization",
+      problem:
+        "探討在高維度二元分類資料中，單一模型可能因資料特性與泛化誤差而造成表現不穩定的問題。",
+      method:
+        "使用SVM、Random Forest、MLP 與 KNN作為第一層基礎模型，並以Logistic Regression作為第二層meta-classifier進行Stacked Generalization。",
+      finding:
+        "研究結果顯示，Stacked Generalization在多項分類指標上優於單一模型，代表異質模型整合有助於改善分類表現與泛化能力。",
+      relation:
+        "我們延伸其概念，將Stacking應用於八個不同領域的二元分類資料集，並進一步比較不同meta learner與加權整合策略。"
+    },
+    {
+      tag: "文獻二｜新型 Meta-model 設計",
+      author: "Wu et al. (2024)",
+      title: "Enhancing Binary Classification: A New Stacking Method via Leveraging Computational Geometry",
+      problem:
+        "傳統Stacking多以Logistic Regression、SVM或Neural Network作為meta-model，但對meta-model本身的設計較少深入探討。",
+      method:
+        "提出以Maximum Weighted Rectangle Problem（MWRP）建立新的Stacking meta-model，並透過Out-of-Fold prediction作為第二層輸入。",
+      finding:
+        "研究指出MWRP-based Stacking在多個資料集上能達到接近或優於單一基礎模型與傳統Stacking的表現，同時具備較高可解釋性。",
+      relation:
+        "我們雖未採用 MWRP，但受到其啟發，重視Stacking中模型選擇、權重設計與可解釋性，因此提出勝算加權與逆變異加權作為比較方法。"
+    }
+  ];
+
+  const comparisonRows = [
+    {
+      item: "研究目標",
+      paper1: "改善高維二元分類中的泛化能力",
+      paper2: "重新設計 Stacking 的 meta-model",
+      ours: "比較多種堆疊與加權策略在不同資料集上的穩定性"
+    },
+    {
+      item: "模型設計",
+      paper1: "異質基礎模型 + Logistic Regression",
+      paper2: "基礎模型 + MWRP 幾何式 meta-model",
+      ours: "16 種基礎模型 + 6 種堆疊／加權整合方法"
+    },
+    {
+      item: "資料範圍",
+      paper1: "單一高維二元分類資料集",
+      paper2: "多個公開二元分類資料集",
+      ours: "八個不同領域二元分類資料集"
+    },
+    {
+      item: "延伸探討",
+      paper1: "驗證異質模型整合的有效性",
+      paper2: "強調meta-model設計與可解釋性",
+      ours: "加入模型篩選、勝算加權與逆變異加權比較"
+    }
+  ];
+
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <SectionTitle
         eyebrow="文獻脈絡回顧"
-        title="文獻概述、研究定位與相關方法介紹"
-        description="此區塊預留給你補上正式文獻內容，建議依照『問題背景 → 相關研究 → 本研究定位』的順序編排。"
+        title="文獻探討、研究定位與方法延伸"
       />
-      <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_1fr]">
+
+      {/* 上方總覽 */}
+      <div className="mt-10 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
         <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>文獻回顧概述</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <BookOpen className="h-5 w-5 text-[#93b5c6]" />
+              文獻回顧概述
+            </CardTitle>
           </CardHeader>
+
           <CardContent className="space-y-4 text-sm leading-7 text-slate-600">
             <p>
-              可先整理二元分類、集成學習、stacking、voting 與 weighted
-              ensembling 的發展脈絡，說明為何單一分類器常受資料特性限制。
+              二元分類任務常受到資料型態、特徵維度、類別比例與模型偏誤影響，
+              因此單一分類器不一定能在所有資料集中維持穩定表現。
             </p>
             <p>
-              接著帶入本研究重點：不只比較 meta
-              learner，也比較基礎模型篩選與不同加權策略對最終結果的影響。
+              Stacking 的核心概念是先訓練多個基礎模型，再將其預測結果作為第二層模型的輸入，
+              使 meta learner 能學習不同模型之間的互補資訊，而非單純平均所有模型結果。
+            </p>
+            <p>
+              我們專題以兩篇文獻為基礎，延伸探討不同基礎模型、模型篩選策略與加權方式，
+              是否能提升二元分類任務中的準確度與穩定性。
             </p>
           </CardContent>
         </Card>
+
         <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>相關研究方法及介紹</CardTitle>
+            <CardTitle className="text-xl">文獻探討架構</CardTitle>
           </CardHeader>
+
           <CardContent className="space-y-3">
             {[
-              "Bagging / Boosting / Stacking 差異比較",
-              "Soft Voting 與 Weighted Voting 概念",
-              "Meta learner 在分類整合中的角色",
-              "模型穩定性、泛化能力與過度擬合討論",
-            ].map((item) => (
+              "問題背景：單一模型在不同資料條件下可能不穩定",
+              "相關研究一：Stacked Generalization可整合異質模型優勢",
+              "相關研究二：Meta-model設計會影響Stacking效果與可解釋性",
+              "研究目的：比較多資料集、多模型篩選與多種加權堆疊策略"
+            ].map((item, idx) => (
               <div
                 key={item}
-                className="rounded-2xl bg-[#f5efe4] p-4 text-sm text-slate-700 shadow-sm"
+                className="flex items-start gap-3 rounded-2xl bg-[#f5efe4] p-4 text-sm text-slate-700 shadow-sm"
               >
-                {item}
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#93b5c6] text-xs font-bold text-white">
+                  {idx + 1}
+                </span>
+                <span className="leading-6">{item}</span>
               </div>
             ))}
           </CardContent>
         </Card>
       </div>
+
+      {/* 兩篇文獻卡片 */}
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        {litCards.map((item) => (
-          <Card key={item.title} className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-lg">{item.title}</CardTitle>
+        {literaturePapers.map((paper) => (
+          <Card
+            key={paper.title}
+            className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm"
+          >
+            <CardHeader className="border-b border-[#93b5c6]/12 bg-[#ddedaa]/20">
+              <div className="text-sm font-semibold tracking-[0.12em] text-[#93b5c6]">
+                {paper.tag}
+              </div>
+              <CardTitle className="mt-2 text-xl leading-8 text-slate-900">
+                {paper.author}
+              </CardTitle>
+              <CardDescription className="leading-6">
+                {paper.title}
+              </CardDescription>
             </CardHeader>
-            <CardContent className="text-sm leading-7 text-slate-600">
-              {item.desc}
+
+            <CardContent className="space-y-5 p-6 text-sm leading-7 text-slate-600">
+              <div>
+                <h3 className="mb-2 font-semibold text-slate-900">研究問題</h3>
+                <p>{paper.problem}</p>
+              </div>
+
+              <div>
+                <h3 className="mb-2 font-semibold text-slate-900">方法重點</h3>
+                <p>{paper.method}</p>
+              </div>
+
+              <div>
+                <h3 className="mb-2 font-semibold text-slate-900">主要發現</h3>
+                <p>{paper.finding}</p>
+              </div>
+
+              <div className="rounded-2xl bg-[#f7f3ec] p-4">
+                <h3 className="mb-2 font-semibold text-slate-900">與專題關聯</h3>
+                <p>{paper.relation}</p>
+              </div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {/* 對照表 */}
+      <Card className="mt-6 rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-xl">文獻與專題比較</CardTitle>
+
+        </CardHeader>
+
+        <CardContent>
+          <div className="overflow-x-auto rounded-2xl border border-slate-200">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-[#f5efe4] text-slate-700">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">比較面向</th>
+                  <th className="px-4 py-3 font-semibold">Nair et al. (2022)</th>
+                  <th className="px-4 py-3 font-semibold">Wu et al. (2024)</th>
+                  <th className="px-4 py-3 font-semibold">專題</th>
+                </tr>
+              </thead>
+
+              <tbody className="divide-y divide-slate-200 bg-white text-slate-600">
+                {comparisonRows.map((row) => (
+                  <tr key={row.item}>
+                    <td className="px-4 py-4 font-semibold text-slate-900">
+                      {row.item}
+                    </td>
+                    <td className="px-4 py-4 leading-6">{row.paper1}</td>
+                    <td className="px-4 py-4 leading-6">{row.paper2}</td>
+                    <td className="px-4 py-4 leading-6 text-[#d7816a]">
+                      {row.ours}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 本研究定位 */}
+      <Card className="mt-6 rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
+        <CardHeader className="border-b border-[#93b5c6]/12 bg-[#ddedaa]/18">
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <Sparkles className="h-5 w-5 text-[#93b5c6]" />
+            研究目的與差異
+          </CardTitle>
+        </CardHeader>
+
+        <CardContent className="grid gap-4 p-6 md:grid-cols-2">
+          {[
+            {
+              title: "多資料集驗證",
+              desc: "不同於只針對單一資料集，我們使用八個不同領域二元分類資料集，觀察堆疊方法是否具有跨資料穩定性。"
+            },
+            {
+              title: "多基礎模型比較",
+              desc: "納入 16 種基礎模型，涵蓋線性模型、樹模型、Boosting、SVM、KNN、MLP 與機率模型。"
+            },
+            {
+              title: "模型篩選策略",
+              desc: "比較 F1 排序篩選法與四值排序法，避免弱模型過多導致堆疊結果被稀釋。"
+            },
+            {
+              title: "加權方法延伸",
+              desc: "除傳統 Logistic、XGBoost、CatBoost Stacking 外，加入平均加權、勝算加權與逆變異加權進行比較。"
+            }
+          ].map((item) => (
+            <div
+              key={item.title}
+              className="rounded-2xl border border-slate-200 bg-white/90 p-5"
+            >
+              <div className="mb-2 flex items-center gap-2 font-semibold text-slate-900">
+                <CheckCircle2 className="h-4 w-4 text-[#93b5c6]" />
+                {item.title}
+              </div>
+              <p className="text-sm leading-7 text-slate-600">{item.desc}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </section>
   );
 }
