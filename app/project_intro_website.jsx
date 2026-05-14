@@ -1390,7 +1390,6 @@ function MethodPage() {
         <Card className="rounded-[28px] border border-white/70 bg-white/80 shadow-[0_14px_40px_rgba(147,181,198,0.12)] backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-xl"><Sigma className="h-5 w-5 text-[#93b5c6]" />公式定義總覽</CardTitle>
-            <CardDescription>以 KaTeX 渲染數學公式，讓網站更接近論文展示形式</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-sm leading-7 text-slate-600">
             <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 overflow-x-auto"><MathBlock math={"Z(x)=\\left[p_1(x),p_2(x),\\dots,p_k(x)\\right]"} /></div>
